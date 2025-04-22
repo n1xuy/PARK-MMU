@@ -1,0 +1,375 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #ffffff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    background-color: #ffffff;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.logo {
+    cursor: pointer;
+}
+
+.logo-img {
+    height: 40px;
+    transition: opacity 0.3s ease;
+}
+
+.logo-img:hover {
+    opacity: 0.8;
+}
+
+.login-btn {
+    padding: 0.5rem 2rem;
+    border: none;
+    border-radius: 5px;
+    background-color: #2196F3;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.login-btn:hover {
+    background-color: #1976D2;
+}
+
+.announcement-bar {
+    background-color: #f5f5f5;
+    color: #424242;
+    padding: 0.5rem;
+    text-align: center;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.announcement-content {
+    display: inline-block;
+    animation: slide 20s linear infinite;
+}
+
+.announcement-content span {
+    display: inline-block;
+    padding: 0 2rem;
+    font-weight: 500;
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    background-color: #fafafa;
+}
+
+.map-container {
+    flex: 1;
+    margin-bottom: 2rem;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    overflow: hidden;
+    position: relative;
+}
+
+.campus-map-bg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.parking-zones {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.parking-zone {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+}
+
+.zone-marker {
+    width: 40px;
+    height: 40px;
+    background-color: #2196F3;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin: 0 auto;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.parking-zone:hover .zone-marker {
+    transform: scale(1.1);
+}
+
+.zone-status {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ffffff;
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    display: none;
+}
+
+.parking-zone:hover .zone-status {
+    display: block;
+}
+
+.legend {
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.legend h3 {
+    color: #424242;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.legend-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #616161;
+}
+
+.legend-item span {
+    font-size: 10px;
+}
+
+.color-box {
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    border: 1px solid #e0e0e0;
+}
+
+.full-dnl, .full {
+    background-color: #f44336;
+}
+
+.h-full-dnl, .h-full {
+    background-color: #ff9800;
+}
+
+.empty-dnl, .empty {
+    background-color: #4caf50;
+}
+
+.staff {
+    background-color: #2196F3;
+}
+
+.free {
+    background: repeating-linear-gradient(
+        45deg,
+        #ffffff,
+        #ffffff 5px,
+        #9e9e9e 5px,
+        #9e9e9e 10px
+    );
+}
+
+.logo-watermark {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    opacity: 0.2;
+}
+
+.watermark{
+    height: 50px;
+    width: 100px;
+}
+
+@keyframes slide {
+    0% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+@media (max-width: 768px) {
+    .legend-items {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .parking-zone {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .zone-marker {
+        width: 30px;
+        height: 30px;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-content {
+        padding: 1rem;
+    }
+    
+    .legend-items {
+        grid-template-columns: 1fr;
+    }
+    
+    .parking-zone {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .zone-marker {
+        width: 25px;
+        height: 25px;
+        font-size: 0.7rem;
+    }
+}
+
+/* Login Page */
+.login-container {
+    max-width: 400px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.login-container h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+.login-button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.login-button:hover {
+    background-color: #2980b9;
+}
+
+/* Report Status Page Styles */
+.status-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.status-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.report-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.report-button {
+    flex: 1;
+    padding: 1rem;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+}
+
+.report-button.empty {
+    background-color: #2ecc71;
+}
+
+.report-button.h-full {
+    background-color: #f39c12;
+}
+
+.report-button.full {
+    background-color: #e74c3c;
+}
+
+.navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+}
+
+.nav-button {
+    padding: 0.5rem 1rem;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.nav-button:hover {
+    background-color: #2980b9;
+} 
