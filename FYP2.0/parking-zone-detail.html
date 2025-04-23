@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Parking Zone Detail - MMU Parking Finder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: white;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .logo {
+            height: 35px;
+        }
+        
+        .announcement-bar {
+            background-color: #f5f5f5;
+            color: #424242;
+            padding: 0.5rem;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .announcement-content {
+            display: inline-block;
+            animation: slide 20s linear infinite;
+        }
+
+        .announcement-content span {
+            display: inline-block;
+            padding: 0 2rem;
+            font-weight: 500;
+        }
+        
+        @keyframes slide {
+            0% {
+                transform: translateX(100%);
+            }
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+        
+        .zone-detail-container {
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .zone-name-container {
+            background-color: #e0e0e0;
+            border-radius: 25px;
+            padding: 15px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .zone-name {
+            font-size: 22px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .zone-info {
+            margin: 20px 0;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+        
+        .info-value {
+            font-size: 14px;
+        }
+        
+        .report-label {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .button-container {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background-color: #e0e0e0;
+            padding: 10px;
+            border-radius: 30px;
+        }
+        
+        .action-button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .action-button img {
+            width: 25px;
+            height: 25px;
+        }
+        
+        .report-section {
+            margin-top: 150px;
+            background-color: #e0e0e0;
+            border-radius: 25px;
+            padding: 15px;
+            overflow: hidden;
+        }
+        
+        .report-buttons {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px 0;
+        }
+        
+        .color-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .green-btn {
+            background-color: #4CAF50;
+        }
+        
+        .orange-btn {
+            background-color: #FF9800;
+        }
+        
+        .red-btn {
+            background-color: #F44336;
+        }
+        
+        .report-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            background-color: #e0e0e0;
+            color: #333;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-top: 1px solid #ccc;
+            cursor: pointer;
+        }
+        
+        .footer-logo {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            width: 70px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-section">
+            <img src="(1)LOGO.png" alt="Logo" class="logo">
+        </div>
+    </header>
+
+    <div class="announcement-bar">
+        <div class="announcement-content">
+            <span>Welcome to MMU Parking Finder</span>
+        </div>
+    </div>
+
+    <div class="zone-detail-container">
+        <div class="zone-name-container">
+            <h1 class="zone-name" id="zoneName">PARKING ZONE 1</h1>
+        </div>
+        
+        <div>
+            <p class="report-label">Report Status</p>
+        </div>
+        
+        <div class="zone-info">
+            <div class="info-row">
+                <div class="info-label">LAST REPORT TIME</div>
+                <div class="info-value">:</div>
+                <div class="info-value" id="lastReportTime">-</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">LAST REPORT DATE</div>
+                <div class="info-value">:</div>
+                <div class="info-value" id="lastReportDate">-</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">TOTAL REPORT TODAY</div>
+                <div class="info-value">:</div>
+                <div class="info-value" id="totalReports">-</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">LOCATION</div>
+                <div class="info-value">:</div>
+                <div class="info-value" id="location">
+                    <a href="#" onclick="openGoogleMaps()" style="color: blue; text-decoration: underline;">View on Google Maps</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="button-container">
+            <button class="action-button return-btn" onclick="window.location.href='index.html'">
+                <img src="images/arrow-back.png" alt="Back" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\'><path d=\'M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z\' fill=\'%23333333\'/></svg>'">
+            </button>
+            <button class="action-button location-btn" onclick="openGoogleMaps()">
+                <img src="images/location.png" alt="Location" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\'><path d=\'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z\' fill=\'%23333333\'/></svg>'">
+            </button>
+        </div>
+        
+        <div class="report-section">
+            <p class="report-label">Report Your Parking Zone</p>
+            
+            <div class="report-buttons">
+                <button class="color-button green-btn" onclick="setSelectedStatus('EMPTY')"></button>
+                <button class="color-button orange-btn" onclick="setSelectedStatus('HALF-FULL')"></button>
+                <button class="color-button red-btn" onclick="setSelectedStatus('FULL')"></button>
+            </div>
+            
+            <button class="report-btn" onclick="reportStatus()">REPORT</button>
+        </div>
+        
+        <img src="(1)LOGO.png" alt="Logo" class="footer-logo">
+    </div>
+    
+    <script>
+        // Get zone information from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const zoneId = urlParams.get('zone') || 1;
+        const zoneName = "PARKING ZONE " + zoneId;
+        document.getElementById("zoneName").textContent = zoneName;
+        
+        // Store the selected status
+        let selectedStatus = "";
+        
+        function setSelectedStatus(status) {
+            selectedStatus = status;
+            // Could add visual indication of selection here
+        }
+        
+        // Report status function
+        function reportStatus() {
+            if (!selectedStatus) {
+                alert("Please select a status (green, orange, or red)");
+                return;
+            }
+            
+            // Update the time and date
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const dateString = now.toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'});
+            
+            document.getElementById("lastReportTime").textContent = timeString;
+            document.getElementById("lastReportDate").textContent = dateString;
+            
+            // Update report count
+            const reportCountElement = document.getElementById("totalReports");
+            let currentCount = 0;
+            if (reportCountElement.textContent !== "-") {
+                currentCount = parseInt(reportCountElement.textContent);
+            }
+            reportCountElement.textContent = (currentCount + 1).toString();
+            
+            // Show confirmation to user
+            alert("Thank you for reporting! The status has been updated to " + selectedStatus);
+        }
+        
+        // Function to open Google Maps with the location
+        function openGoogleMaps() {
+            // Direct to Multimedia University FCI Department
+            const location = "Multimedia University Faculty of Computing and Informatics";
+            window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`, '_blank');
+        }
+    </script>
+</body>
+</html> 
