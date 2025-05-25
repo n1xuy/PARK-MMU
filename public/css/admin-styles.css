@@ -1,0 +1,181 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #E5E5E5;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.admin-container {
+    background: white;
+    width: 100%;
+    max-width: 380px;
+    min-height: 650px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header Styles */
+.admin-header {
+    padding: 20px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+}
+
+.admin-logo {
+    height: 35px;
+    width: auto;
+}
+
+.admin-title {
+    font-size: 16px;
+    color: #000;
+    font-weight: normal;
+    text-transform: uppercase;
+}
+
+/* Button Container Styles */
+.button-container {
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex-grow: 1;
+}
+
+.admin-button {
+    background: #E8E8E8;
+    border: none;
+    padding: 15px;
+    border-radius: 30px;
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+    text-transform: uppercase;
+    color: #333;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.admin-button:hover {
+    background: #D0D0D0;
+}
+
+/* Back Button Styles */
+.back-button {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 45px;
+    height: 45px;
+    background: white;
+    border: 2px solid #333;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.back-button img {
+    width: 20px;
+    height: 20px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 480px) {
+    .admin-container {
+        height: 100vh;
+        max-width: none;
+    }
+    
+    .button-container {
+        padding: 20px;
+    }
+    
+    .admin-header {
+        padding: 15px;
+    }
+}
+
+/* Login and Change Password Styles */
+.login-content,
+.change-password-content {
+    padding: 30px 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.page-title {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    font-weight: bold;
+    text-align: center;
+}
+
+.login-form,
+.change-password-form {
+    width: 100%;
+    max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.form-group input {
+    padding: 12px;
+    border: none;
+    background: #f5f5f5;
+    font-size: 14px;
+    width: 100%;
+}
+
+.login-button,
+.change-password-button {
+    background: #E8E8E8;
+    border: none;
+    padding: 10px;
+    width: 80px;
+    margin: 20px auto 0;
+    cursor: pointer;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.login-button:hover,
+.change-password-button:hover {
+    background: #D0D0D0;
+} 

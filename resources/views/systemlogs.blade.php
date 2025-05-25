@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>System Logs - MMU Parking Finder</title>
+    <link rel="stylesheet" href="{{ asset('css/admin-styles.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/logs-styles.css') }}">
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <div class="logo-section">
+                <img src="{{ asset('images/(1)LOGO.png') }}" alt="ParkMMU Logo" class="admin-logo">
+            </div>
+            <h1 class="admin-title">ADMIN</h1>
+        </div>
+        
+        <div class="logs-content">
+            <h2 class="page-title">SYSTEM LOGS</h2>
+            
+            <div class="table-container">
+                <table class="logs-table">
+                    <thead>
+                        <tr>
+                            <th>Login Title</th>
+                            <th>Login Type</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Admin Login</td>
+                            <td>Administrator</td>
+                            <td>2024-02-20</td>
+                            <td>09:15</td>
+                        </tr>
+                        <tr>
+                            <td>User Login</td>
+                            <td>Student</td>
+                            <td>2024-02-20</td>
+                            <td>10:30</td>
+                        </tr>
+                        <!-- Add more rows as needed -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <a href="{{ route('admin.menu') }}" class="back-button">
+            <img src="{{ asset('images/return page.png') }}" alt="Back">
+        </a>
+    </div>
+</body>
+</html> 
