@@ -5,6 +5,13 @@
     font-family: Arial, sans-serif;
 }
 
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
 body {
     background-color: #ffffff;
     min-height: 100vh;
