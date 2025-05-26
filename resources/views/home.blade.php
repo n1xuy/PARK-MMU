@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 </head>
 <body>
+    @if (session('cleared'))
+        <div class="clear-notice">{{ session('cleared') }}</div>
+    @endif
     <header>
         <div class="logo">
             <a href="{{ route ('admin.login')}}">
@@ -32,12 +35,15 @@
 
     <div class="announcement-bar">
         <div class="announcement-content">
-        @if($announcement)
-            <span id="current-announcement">{{ $announcement->title }} - {{ $announcement->details }}</span>
-            <small id="announcement-time">({{ $announcement->created_at->format('d M Y, h:i A') }})</small>
-        @else
-            <span id="current-announcement">Welcome to PARK MMU!</span>
-        @endif
+            @if ($announcement)
+                <div class="announcement-display">
+                    <strong>{{ $announcement->title }}</strong><br>
+                    {{ $announcement->date }} at {{ \Carbon\Carbon::parse($announcement->time)->format('h:i A') }}<br>
+                    {{ $announcement->details }}
+                </div>
+            @else
+                <div class="announcement-display">🚫 No current announcements.</div>
+            @endif
         </div>
     </div>
 

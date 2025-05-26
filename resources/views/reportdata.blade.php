@@ -9,7 +9,9 @@
     <div class="admin-container">
         <div class="admin-header">
             <div class="logo-section">
+                <a href="{{ route('home') }}" class="admin-logo">
                 <img src="{{ asset('images/(1)LOGO.png') }}" alt="ParkMMU Logo" class="admin-logo">
+                </a>
             </div>
             <h1 class="admin-title">ADMIN</h1>
         </div>
@@ -20,33 +22,38 @@
             <div class="table-container">
                 <table class="report-table">
                     <thead>
+                    <tr>
+                    <th>No</th>
+                    <th>Parking Status</th>
+                    <th>User Name</th>
+                    <th>USER ID</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    </tr>
+                </thead>
+                </tbody>
+                     @foreach ($reports as $index => $report)
                         <tr>
-                            <th>No</th>
-                            <th>Report Status</th>
-                            <th>User Type</th>
-                            <th>User ID</th>
-                            <th>Date</th>
-                            <th>Time</th>
+                            <td>{{ $index + 1 }}</td>
+                            <td>
+                                @switch($report->status)
+                                    @case(1)
+                                        Empty
+                                        @break
+                                    @case(2)
+                                        Half Full
+                                        @break
+                                    @case(3)
+                                        Full Parking
+                                        @break
+                                @endswitch
+                            </td>
+                            <td>{{ $report->user->fullname ?? 'Unknown' }}</td> <!-- if you have relation -->
+                            <td>{{ $report->user->id ?? 'N/A' }}</td>
+                            <td>{{ $report->created_at->format('Y-m-d') }}</td>
+                            <td>{{ $report->created_at->format('H:i') }}</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>No Parking</td>
-                            <td>Student</td>
-                            <td>1211101234</td>
-                            <td>2024-02-20</td>
-                            <td>14:30</td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Full Parking</td>
-                            <td>Staff</td>
-                            <td>ST123456</td>
-                            <td>2024-02-20</td>
-                            <td>15:45</td>
-                        </tr>
-                        <!-- Add more rows as needed -->
+                        @endforeach
                     </tbody>
                 </table>
             </div>

@@ -2,49 +2,60 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Announcement;
+use App\Models\Announcement; // Add this line
 use Illuminate\Http\Request;
 
 class AnnouncementController extends Controller
 {
-    public function update(Request $request)
-{
-    $validated = $request->validate([
-        'title' => 'required|string|max:255',
-        'date' => 'required|date',
-        'time' => 'required',
-        'details' => 'required|string'
-    ]);
+    public function create()
+    {
+        return view('announcement-edit');
+    }
 
-    $datetime = $validated['date'] . ' ' . $validated['time'];
-    
-    $announcement = Announcement::updateOrCreate(
-        ['id' => 1], // Assuming you only keep one announcement
-        [
-            'title' => $validated['title'],
-            'details' => $validated['details'],
-            'is_active' => true,
-            'created_at' => $datetime,
-            'updated_at' => now()
-        ]
-    );
-    
-    return response()->json([
-        'success' => true,
-        'announcement' => [
-            'title' => $announcement->title,
-            'details' => $announcement->details,
-            'time' => $announcement->created_at->format('d M Y, h:i A')
-        ]
-    ]);
-}
+    public function update(Request $request, Announcement $announcement)
+    {
+        $validated = $request->validate([
+            'title' => 'required',
+            'date' => 'required|date',
+            'time' => 'required',
+            'details' => 'required'
+        ]);
 
-    public function edit()
-{
+        $announcement->update($validated);
 
-    $announcement = Announcement::active()->latest()->first(); // scope
-    
-    return view('announcementedit', compact('announcement'));
-}
+        return redirect()->route('admin.announce')->with('success', 'Announcement updated successfully!');
+    }
+
+    public function edit(Announcement $announcement)
+    {       
+        return view ('announcement-edit', compact('announcement'));
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string',
+            'date' => 'required|date',
+            'time' => 'required',
+            'details' => 'required|string',
+        ]);
+
+        Announcement::create($validated);
+
+        return redirect()->route('admin.announce')->with('success', 'Announcement created.');
+    }
+
+    public function clear($id)
+    {
+        $announcement = Announcement::findOrFail($id);
+        $announcement->update([
+            'title' => '',
+            'date' => null,
+            'time' => null,
+            'details' => '',
+        ]);
+
+        return redirect()->back()->with('cleared', 'Announcement has been cleared.');
+    }
 
 }

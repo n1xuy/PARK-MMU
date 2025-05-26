@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('announcements', function (Blueprint $table) {
-            $table->renameColumn('active', 'is_active');
+        Schema::create('system_logs', function (Blueprint $table) {
+            $table->id();
+            $table->string('description');
+            $table->string('action');
+            $table->timestamps();
         });
     }
 
@@ -21,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('announcements', function (Blueprint $table) {
-            $table->renameColumn('active', 'is_active');
-        });
+        Schema::dropIfExists('system_logs');
     }
 };

@@ -13,7 +13,7 @@ class ParkingZonesSeeder extends Seeder
     public function run(): void
     {
         $zones = [
-        ['zone_number' => 1, 'name' => 'P1', 'status' => 'empty', 'location' => 'MMU Block A', 'map_url' => ''],
+        ['zone_number' => 1, 'name' => 'P1', 'status' => 'empty', 'location' => 'MMU Block A'],
         ['zone_number' => 2, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B'],
         ['zone_number' => 3, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B'],
         ['zone_number' => 4, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B'],
@@ -31,6 +31,7 @@ class ParkingZonesSeeder extends Seeder
     ];
 
     foreach ($zones as $zone) {
+
         \App\Models\ParkingZone::updateOrCreate(
             ['zone_number' => $zone['zone_number']], // Search condition
             $zone // Data to insert/update

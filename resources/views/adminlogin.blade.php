@@ -149,24 +149,32 @@
         <h1>Admin Login</h1>
         <p class="subtitle">Enter to continue</p>
         
-        <form action="{{ route('adminlogin') }}" method="POST">
-            @csrf
-            <div class="input-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
-                @error('password')
-                <span style="color: red" class="error-message">{{ $message }}</span>
-                @enderror
-                </div>
-            
-                <div class="forgot-password">
-                    <a href="#">Forgot password?</a>
-                </div>
-            </div>
-            
-            <button type="submit" class="btn">Login</button>
-            <a href="{{ route('home') }}" class="return-btn">Return</a>
-        </form>
+    <form action="{{ route('adminlogin') }}" method="POST">
+        @csrf
+
+        <div class="input-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+            @error('username')
+            <span style="color: red" class="error-message">{{ $message }}</span>
+            @enderror
+        </div>
+
+        <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+            @error('password')
+            <span style="color: red" class="error-message">{{ $message }}</span>
+            @enderror
+        </div>
+
+        <div class="forgot-password">
+            <a href="#">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn">Login</button>
+        <a href="{{ route('home') }}" class="return-btn">Return</a>
+    </form>
     </div>
 </body>
 </html>

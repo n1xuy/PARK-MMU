@@ -10,9 +10,10 @@ return new class extends Migration
     {
         Schema::create('announcements', function (Blueprint $table) {
             $table->id();
-            $table->text('title');
-            $table->text('details');    
-            $table->boolean('is_active')->default(true);
+            $table->string('title');  
+            $table->text('details');
+            $table->date('date');
+            $table->time('time');
             $table->timestamps();
         });
     }

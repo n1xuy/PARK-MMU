@@ -5,6 +5,13 @@
     font-family: Arial, sans-serif;
 }
 
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
 body {
     background-color: #E5E5E5;
     min-height: 100vh;
@@ -14,11 +21,9 @@ body {
 }
 
 .admin-container {
-    background: white;
     width: 100%;
-    max-width: 380px;
-    min-height: 650px;
-    position: relative;
+    min-height: 100vh;
+    background: white;
     display: flex;
     flex-direction: column;
 }
@@ -78,7 +83,7 @@ body {
 
 /* Back Button Styles */
 .back-button {
-    position: absolute;
+    position: fixed;
     bottom: 20px;
     right: 20px;
     width: 45px;
@@ -94,8 +99,8 @@ body {
 }
 
 .back-button img {
-    width: 20px;
-    height: 20px;
+    width: 50px;
+    height: 50px;
 }
 
 /* Responsive Adjustments */
@@ -179,3 +184,7 @@ body {
 .change-password-button:hover {
     background: #D0D0D0;
 } 
+
+.report-content {
+    padding: 20px;
+}

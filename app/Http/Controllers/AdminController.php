@@ -2,25 +2,36 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Hash;
 use App\Models\Admin;
+use App\Models\SystemLog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
 
 public function login(Request $request)
 {
-    $request->validate(['password' => 'required|string']);
-    
-    $correctPassword = '$2y$12$heaGMbOJHZ/q1.PHw.PJGutYdflCSFNceayep6jcV2yw8g.3lnO3G'; 
-    
-    if (Hash::check($request->password, $correctPassword)) {
-        $request->session()->put('admin_authenticated', true);
-        $request->session()->regenerate();
-        return redirect()->route('admin.menu');
-    }
-    
-    return back()->withErrors(['password' => 'Invalid password']);
+    $request->validate([
+            'username' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        $admin = Admin::where('username', $request->username)->first();
+
+        if ($admin && Hash::check($request->password, $admin->password)) {
+
+            SystemLog::create([
+                'description' => "Admin '{$admin->username}' logged in",
+                'action' => 'Admin Login',
+            ]);
+
+            $request->session()->put('admin_authenticated', true);
+            $request->session()->put('admin_id', $admin->id);
+            $request->session()->regenerate();
+            return redirect()->route('admin.menu');
+        }
+
+        return back()->withErrors(['username' => 'Invalid credentials']);
 }
 }

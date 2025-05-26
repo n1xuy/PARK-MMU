@@ -9,11 +9,5 @@ class Announcement extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'content', 'is_active'];
-
-    // Add this scope method
-    public function scopeActive($query)
-    {
-        return $query->where('is_active', true);
-    }
+    protected $fillable = ['title', 'date', 'time', 'details'];
 }

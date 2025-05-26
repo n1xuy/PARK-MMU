@@ -1,16 +1,19 @@
 <?php
 
+use App\Models\Announcement;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ZoneController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SystemLogController;
+use App\Http\Controllers\ReportDataController;
 use App\Http\Controllers\ParkingZoneController;
 use App\Http\Controllers\AnnouncementController;
 
 Route::get('/', function () {
-    $announcement = App\Models\Announcement::active()->latest()->first();
-    return view('home',['announcement' => $announcement]);;
+    $announcement = \App\Models\Announcement::latest()->first(); 
+    return view('home',compact('announcement'));
 })->name('home');
 
 Route::get('/student-login', function () {
@@ -32,20 +35,18 @@ Route::get('/admin-login', function(){
 Route::post('/admin-login',[AdminController::class, 'login'])->name('adminlogin');
 
 Route::get('/admin', function(){
-    return view('admin');
+    $announcement = Announcement::latest()->first(); 
+    return view('admin', compact('announcement'));
 })->name('admin.menu');
 
-Route::get('/admin-announce', function(){
-    return view('announcementedit');
-})->name('admin.announce');
+Route::get('/admin-announce', function () {
+    $announcements = Announcement::latest()->first() ?? new Announcement();
+    return view('announcement-edit', compact('announcements'));
+});
 
 Route::get('/admin-parkmanage', function(){
     return view('parkmanagement');
 })-> name('admin.parkmanage');
-
-Route::get('/admin-reportdata', function(){
-    return view('reportdata');
-})-> name('admin.report');
 
 Route::get('/admin-logs', function(){
     return view('systemlogs');
@@ -70,5 +71,18 @@ Route::post('/report-status', [ReportController::class, 'reportStatus'])
 Route::get('/parking-detail/{zone_number}', [ParkingZoneController::class, 'show'])
      ->name('parkinfo');
 
-Route::post('/admin/announcement/update', [AnnouncementController::class, 'update'])->name('announcement.update');
+Route::get('/admin-logs', [SystemLogController::class, 'index'])->name('admin.syslogs');
+
+Route::get('/announcements', function () {
+    return \App\Models\Announcement::all();
+});
+
+Route::get('/announcements/{announcement}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
+Route::put('/announcements/{announcement}', [AnnouncementController::class, 'update'])->name('announcements.update');
+Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
+Route::post('/announcements/clear/{id}', [AnnouncementController::class, 'clear'])->name('announcements.clear');
+
+Route::get('/admin-reportdata', [ReportDataController::class, 'index'])->name('admin.report');
+Route::get('/admin-announce', [AnnouncementController::class, 'createOrEdit'])->name('admin.announce');
+Route::get('/admin-announce', [AnnouncementController::class, 'create'])->name('admin.announce');
 
