@@ -43,8 +43,16 @@ body {
 }
 
 .admin-logo {
-    height: 35px;
-    width: auto;
+    height: 40px;
+    transition: transform 0.2s ease, opacity 0.3s ease;
+}
+
+.admin-logo:hover{
+     opacity: 0.8;
+}
+
+.admin-logo:active{
+     transform: scale(1.1);
 }
 
 .admin-title {
@@ -187,4 +195,14 @@ body {
 
 .report-content {
     padding: 20px;
+}
+
+.admin-title {
+    position: absolute;
+    left: 50%;
+    top: 15px;
+    transform: translateX(-50%);
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
 }

@@ -34,11 +34,15 @@ header {
 
 .logo-img {
     height: 40px;
-    transition: opacity 0.3s ease;
+    transition: transform 0.2s ease, opacity 0.3s ease;
 }
 
 .logo-img:hover {
     opacity: 0.8;
+}
+
+.logo-img:active{
+     transform: scale(1.1);
 }
 
 .login-btn {
@@ -316,20 +320,44 @@ header {
     border-radius: 3px;
 }
 
-.login-button {
-    width: 100%;
-    padding: 0.75rem;
-    background-color: #3498db;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+.login-btn {
+ width: 6.5em;
+ height: 2.3em;
+ margin: 0.5em;
+ background: black;
+ color: white;
+ border: none;
+ border-radius: 0.625em;
+ font-size: 20px;
+ font-weight: bold;
+ cursor: pointer;
+ position: relative;
+ z-index: 1;
+ overflow: hidden;
 }
 
-.login-button:hover {
-    background-color: #2980b9;
+.login-btn:hover {
+color: black;
 }
 
+.login-btn:after{
+    content: "";
+ background: white;
+ position: absolute;
+ z-index: -1;
+ left: -20%;
+ right: -20%;
+ top: 0;
+ bottom: 0;
+ transform: skewX(-45deg) scale(0, 1);
+ transition: all 0.5s;
+}
+
+.login-btn:hover:after{
+transform: skewX(-45deg) scale(1, 1);
+ -webkit-transition: all 0.5s;
+ transition: all 0.5s;
+}
 /* Report Status Page Styles */
 .status-container {
     max-width: 800px;
@@ -402,7 +430,7 @@ header {
     display: none;
     position: absolute;
     right: 0;
-    background-color: #f9f9f9;
+    background-color: black;
     min-width: 160px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
@@ -410,14 +438,14 @@ header {
 }
 
 .dropdown-content a {
-    color: black;
+    color: white;
     padding: 12px 16px;
     text-decoration: none;
     display: block;
 }
 
 .dropdown-content a:hover {
-    background-color: #f1f1f1;
+    background-color:grey ;
     border-radius: 4px;
 }
 

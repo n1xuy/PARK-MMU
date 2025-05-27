@@ -24,6 +24,7 @@
                     <thead>
                     <tr>
                     <th>No</th>
+                    <th>Parking Zone</th>
                     <th>Parking Status</th>
                     <th>User Name</th>
                     <th>USER ID</th>
@@ -32,9 +33,11 @@
                     </tr>
                 </thead>
                 </tbody>
+    
                      @foreach ($reports as $index => $report)
                         <tr>
                             <td>{{ $index + 1 }}</td>
+                           <td>{{ $report->parkingZone->location ?? 'Unknown Location' }}</td>
                             <td>
                                 @switch($report->status)
                                     @case(1)
@@ -48,7 +51,7 @@
                                         @break
                                 @endswitch
                             </td>
-                            <td>{{ $report->user->fullname ?? 'Unknown' }}</td> <!-- if you have relation -->
+                            <td>{{ $report->user->fullname ?? 'Unknown' }}</td> 
                             <td>{{ $report->user->id ?? 'N/A' }}</td>
                             <td>{{ $report->created_at->format('Y-m-d') }}</td>
                             <td>{{ $report->created_at->format('H:i') }}</td>

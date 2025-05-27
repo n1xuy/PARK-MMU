@@ -131,7 +131,9 @@
 <body>
     <header>
         <div class="logo">
-            <img src="(1)LOGO.png" alt="Logo">
+            <a href ="{{ route('home') }}">
+            <img src="{{ asset('images/(1)LOGO.png') }}" alt="Logo">
+            </a>
         </div>
         <div class="admin-title">ADMIN</div>
     </header>
@@ -140,28 +142,35 @@
         <h1>Change Password</h1>
         <p class="subtitle">Update your account password</p>
         
-        <form>
+        <form method="POST" action="{{ route('admin.pwupdate') }}">
+            @csrf
             <div class="input-group">
                 <label for="current-password">Current Password</label>
-                <input type="password" id="current-password" name="current-password">
+                <input type="password" id="current-password" name="current_password">
             </div>
             
             <div class="input-group">
                 <label for="new-password">New Password</label>
-                <input type="password" id="new-password" name="new-password">
+                <input type="password" id="new-password" name="new_password">
             </div>
             
             <div class="input-group">
                 <label for="confirm-password">Again Password</label>
-                <input type="password" id="confirm-password" name="confirm-password">
+                <input type="password" id="confirm-password" name="new_password_confirmation">
             </div>
-            
+
+            @if(session('error'))
+                <p style="color: red;">{{ session('error') }}</p>
+            @endif
+            @if(session('success'))
+                <p style="color: green;">{{ session('success') }}</p>
+            @endif
+
             <button type="submit" class="btn">Update Password</button>
             
             <div class="or-divider">
                 <span>or</span>
             </div>
-            
             
 			<a href="{{ route('admin.menu') }}" class="cancel-btn">Cancel</a>
         </form>

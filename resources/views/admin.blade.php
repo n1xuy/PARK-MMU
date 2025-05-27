@@ -9,9 +9,13 @@
     <div class="admin-container">
         <div class="admin-header">
             <div class="logo-section">
+                <a href="{{ route('home') }}">
                 <img src="{{ asset('images/(1)LOGO.png') }}" alt="ParkMMU Logo" class="admin-logo">
+                </a>
             </div>
-            <h1 class="admin-title">ADMIN</h1>
+             <div class="admin-title">
+                ADMIN{{ Auth::guard('admin')->user()?->username ? ' - ' . Auth::guard('admin')->user()->username : '' }}
+            </div>
         </div>
         
         <div class="button-container">

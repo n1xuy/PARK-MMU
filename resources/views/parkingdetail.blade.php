@@ -204,7 +204,9 @@
 <body>
     <header>
         <div class="logo-section">
+            <a href ="{{ route('home') }}">
             <img src="{{ asset('images/(1)LOGO.png') }}" alt="Logo" class="logo">
+            </a>
         </div>
     </header>
 

@@ -10,6 +10,7 @@ class ReportDataController extends Controller
         public function index()
     {
         $reports = Report::orderBy('created_at', 'desc')->get();
+        $reports = Report::with('parkingZone')->get();
         return view('reportdata', compact('reports'));
     }
 }

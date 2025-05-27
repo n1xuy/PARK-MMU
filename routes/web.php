@@ -31,8 +31,16 @@ Route::post('/student-register',[UserController::class, 'registration'])->name('
 Route::get('/admin-login', function(){
     return view('adminlogin');
 })->name('admin.login');
+Route::get('/login', function () {
+    return redirect()->route('admin.login');
+})->name('login');
 
 Route::post('/admin-login',[AdminController::class, 'login'])->name('adminlogin');
+
+Route::middleware(['auth:admin'])->group(function(){
+Route::get('/admin/change-password',[AdminController::class,'AdminController@showChangePasswordForm'])->name('admin.changepw');
+Route::post('/admin/change-password', [AdminController::class, 'updatePassword'])->name('admin.pwupdate');
+});
 
 Route::get('/admin', function(){
     $announcement = Announcement::latest()->first(); 
@@ -78,11 +86,18 @@ Route::get('/announcements', function () {
 });
 
 Route::get('/announcements/{announcement}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
+
 Route::put('/announcements/{announcement}', [AnnouncementController::class, 'update'])->name('announcements.update');
+
 Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
+
 Route::post('/announcements/clear/{id}', [AnnouncementController::class, 'clear'])->name('announcements.clear');
 
 Route::get('/admin-reportdata', [ReportDataController::class, 'index'])->name('admin.report');
+
 Route::get('/admin-announce', [AnnouncementController::class, 'createOrEdit'])->name('admin.announce');
+
 Route::get('/admin-announce', [AnnouncementController::class, 'create'])->name('admin.announce');
+
+
 

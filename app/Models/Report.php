@@ -28,4 +28,8 @@ class Report extends Model
     {
         return $this->belongsTo(ParkingZone::class, 'parking_zone_id');
     }
+    public function parkingZone()
+    {
+        return $this->belongsTo(\App\Models\ParkingZone::class);
+    }
 }
