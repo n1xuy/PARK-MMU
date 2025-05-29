@@ -1,4 +1,4 @@
-<p align="center"><a href="" target="_blank"><img src="https://imgur.com/Fi75qTD" width="400" alt="ParkMMU Logo"></a></p>
+<p align="center"><a href="" target="_blank"><img src="https://i.imgur.com/Fi75qTD.png" width="400" alt="ParkMMU Logo"></a></p>
 
 <p align="center">
 
