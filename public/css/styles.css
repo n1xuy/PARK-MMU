@@ -63,9 +63,10 @@ header {
 .announcement-bar {
     background-color: #f9f9f9;
     border: 2px solid #ddd;
-    padding: 15px;
-    margin: 20px;
+    padding: 5px;
+    margin: 15px ;
     border-radius: 10px;
+    text-align: center;
 }
 
 .announcement-display {
@@ -75,10 +76,11 @@ header {
     line-height: 1.5;
 }
 
-.announcement-display strong {
+.announcement-display h3 {
     font-size: 18px;
-    color: #007bff;
+    color: black;
 }
+
 
 .announcement-content {
     display: inline-block;

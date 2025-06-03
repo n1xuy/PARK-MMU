@@ -8,12 +8,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class ParkingZone extends Model
 {
     protected $fillable = [
-        'name', 
+        'name',
         'status',
-        'zone_number', // Add this
-        'location',
         'last_reported_at',
-        'total_reports'
+        'total_reports',
+        'zone_number',
+        'location',
+        'total_empty',
+        'total_half_full',
+        'total_full',
+        'reliable_status',
+        'reliable_status_updated_at',
     ];
 
     public function reports(): HasMany
@@ -36,6 +41,5 @@ class ParkingZone extends Model
             'last_reported_at' => now()
         ]);
     }
-
 
 }

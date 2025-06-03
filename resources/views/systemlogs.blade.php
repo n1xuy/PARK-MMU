@@ -23,8 +23,9 @@
                 <table class="logs-table">
                     <thead>
                         <tr>
-                            <th>Login Title</th>
-                            <th>Login Type</th>
+                            <th>Admin Id</th>
+                            <th>Action</th>
+                            <th>Details</th>
                             <th>Date</th>
                             <th>Time</th>
                         </tr>
@@ -32,14 +33,15 @@
                     <tbody>
                     @forelse($logs as $log)
                     <tr>
-                        <td>{{ $log->description ?? 'Login' }}</td>
-                        <td>{{ $log->action ?? 'User' }}</td>
+                        <td>{{ $log->admin->id ?? 'Unknown' }}</td>
+                        <td>{{ $log->action ?? 'Unknown' }}</td>
+                        <td>{{ $log->description ?? 'Unknown' }}</td>
                         <td>{{ $log->created_at->format('Y-m-d') }}</td>
                         <td>{{ $log->created_at->format('H:i') }}</td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="4" style="text-align: center;">No logs available</td>
+                        <td colspan="5" style="text-align: center;">No logs available</td>
                     </tr>
                      @endforelse
                      </tbody>

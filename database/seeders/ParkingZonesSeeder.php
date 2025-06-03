@@ -13,21 +13,21 @@ class ParkingZonesSeeder extends Seeder
     public function run(): void
     {
         $zones = [
-        ['zone_number' => 1, 'name' => 'P1', 'status' => 'empty', 'location' => 'MMU Block A'],
-        ['zone_number' => 2, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B'],
-        ['zone_number' => 3, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B'],
-        ['zone_number' => 4, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B'],
-        ['zone_number' => 5, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B'],
-        ['zone_number' => 6, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B'],
-        ['zone_number' => 7, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B'],
-        ['zone_number' => 8, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B'],
-        ['zone_number' => 9, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B'],
-        ['zone_number' => 10, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B'],
-        ['zone_number' => 11, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B'],
-        ['zone_number' => 12, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B'],
-        ['zone_number' => 13, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B'],
-        ['zone_number' => 14, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B'],
-        ['zone_number' => 15, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B'],
+        ['zone_number' => 1, 'name' => 'P1', 'status' => 'empty', 'location' => 'MMU Block A', 'total_empty' => 0,'total_half_full' => 0,'total_full' => 0],
+        ['zone_number' => 2, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B', 'total_empty' => 0,'total_half_full' => 0,'total_full' => 0],
+        ['zone_number' => 3, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B', 'total_empty' => 0,'total_half_full' => 0,'total_full' => 0],
+        ['zone_number' => 4, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B', 'total_empty' => 0,'total_half_full' => 0,'total_full' => 0],
+        ['zone_number' => 5, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B', 'total_empty' => 0,'total_half_full' => 0,'total_full' => 0],
+        ['zone_number' => 6, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B', 'total_empty' => 0,'total_half_full' => 0,'total_full' => 0],
+        ['zone_number' => 7, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B', 'total_empty' => 0,'total_half_full' => 0,'total_full' => 0],
+        ['zone_number' => 8, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B', 'total_empty' => 0,'total_half_full' => 0,'total_full' => 0],
+        ['zone_number' => 9, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B', 'total_empty' => 0,'total_half_full' => 0,'total_full' => 0],
+        ['zone_number' => 10, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B', 'total_empty' => 0,'total_half_full' => 0,'total_full' => 0],
+        ['zone_number' => 11, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B', 'total_empty' => 0,'total_half_full' => 0,'total_full' => 0],
+        ['zone_number' => 12, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B', 'total_empty' => 0,'total_half_full' => 0,'total_full' => 0],
+        ['zone_number' => 13, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B', 'total_empty' => 0,'total_half_full' => 0,'total_full' => 0],
+        ['zone_number' => 14, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B', 'total_empty' => 0,'total_half_full' => 0,'total_full' => 0],
+        ['zone_number' => 15, 'name' => 'P2', 'status' => 'empty', 'location' => 'MMU Block B', 'total_empty' => 0,'total_half_full' => 0,'total_full' => 0],
     ];
 
     foreach ($zones as $zone) {

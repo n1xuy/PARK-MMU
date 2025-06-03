@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('parking_zones', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('status')->default('empty'); // empty/half-full/full/staff
+            $table->string('status')->default('empty'); 
             $table->timestamp('last_reported_at')->nullable();
             $table->integer('total_reports')->default(0);
-            $table->integer('zone_number')->unique(); // For your P1-P15 markers
+            $table->integer('zone_number')->unique(); 
             $table->text('location')->nullable();
             $table->timestamps();  
         });

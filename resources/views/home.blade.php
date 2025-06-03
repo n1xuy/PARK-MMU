@@ -37,7 +37,7 @@
         <div class="announcement-content">
             @if ($announcement)
                 <div class="announcement-display">
-                    <strong>{{ $announcement->title }}</strong><br>
+                    <h3>{{ $announcement->title }}</h3><br>
                     {{ $announcement->date }} at {{ \Carbon\Carbon::parse($announcement->time)->format('h:i A') }}<br>
                     {{ $announcement->details }}
                 </div>

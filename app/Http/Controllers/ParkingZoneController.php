@@ -55,16 +55,16 @@ class ParkingZoneController extends Controller
         };
     }
 
-    public function show($zone_number) 
+    public function show($zoneNumber) 
     {
-        $zone = ParkingZone::where('zone_number', $zone_number)->first();
+        $zone = ParkingZone::where('zone_number', $zoneNumber)->first();
         
-    if (!$zone) {
-        abort(404); // Zone not found
-    }
+        if (!$zone) {
+            abort(404);
+        }
 
-    return view('parkingdetail', [
-        'currentZone' => $zone // Pass zone to view
-    ]);
+        return view('parkingdetail', [
+            'zone' => $zone
+        ]);
     }
 }

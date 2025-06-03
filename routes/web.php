@@ -31,6 +31,7 @@ Route::post('/student-register',[UserController::class, 'registration'])->name('
 Route::get('/admin-login', function(){
     return view('adminlogin');
 })->name('admin.login');
+
 Route::get('/login', function () {
     return redirect()->route('admin.login');
 })->name('login');
@@ -38,7 +39,7 @@ Route::get('/login', function () {
 Route::post('/admin-login',[AdminController::class, 'login'])->name('adminlogin');
 
 Route::middleware(['auth:admin'])->group(function(){
-Route::get('/admin/change-password',[AdminController::class,'AdminController@showChangePasswordForm'])->name('admin.changepw');
+Route::get('/admin/change-password',[AdminController::class,'showChangePasswordForm'])->name('admin.changepw');
 Route::post('/admin/change-password', [AdminController::class, 'updatePassword'])->name('admin.pwupdate');
 });
 
@@ -46,11 +47,6 @@ Route::get('/admin', function(){
     $announcement = Announcement::latest()->first(); 
     return view('admin', compact('announcement'));
 })->name('admin.menu');
-
-Route::get('/admin-announce', function () {
-    $announcements = Announcement::latest()->first() ?? new Announcement();
-    return view('announcement-edit', compact('announcements'));
-});
 
 Route::get('/admin-parkmanage', function(){
     return view('parkmanagement');
@@ -76,6 +72,10 @@ Route::post('/report-status', [ReportController::class, 'reportStatus'])
     ->middleware('auth')
     ->name('report.submit');
 
+Route::post('/submit-report', [ReportController::class, 'reportStatus'])
+    ->middleware('auth');
+
+
 Route::get('/parking-detail/{zone_number}', [ParkingZoneController::class, 'show'])
      ->name('parkinfo');
 
@@ -85,19 +85,24 @@ Route::get('/announcements', function () {
     return \App\Models\Announcement::all();
 });
 
-Route::get('/announcements/{announcement}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
 
-Route::put('/announcements/{announcement}', [AnnouncementController::class, 'update'])->name('announcements.update');
+Route::prefix('admin')->middleware('auth:admin')->group(function () {
+    Route::get('/announcement', [AnnouncementController::class, 'handleAnnouncement'])->name('admin.announce');
+    Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
+    Route::put('/announcements/{announcement}', [AnnouncementController::class, 'update'])->name('announcements.update');
+    Route::post('/announcements/{announcement}/clear', [AnnouncementController::class, 'clear'])->name('announcements.clear');
+});
 
-Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
-
-Route::post('/announcements/clear/{id}', [AnnouncementController::class, 'clear'])->name('announcements.clear');
 
 Route::get('/admin-reportdata', [ReportDataController::class, 'index'])->name('admin.report');
 
-Route::get('/admin-announce', [AnnouncementController::class, 'createOrEdit'])->name('admin.announce');
 
-Route::get('/admin-announce', [AnnouncementController::class, 'create'])->name('admin.announce');
+Route::middleware(['auth'])->group(function () {
+    Route::post('/submit-report', [ReportController::class, 'reportStatus'])->name('report.status');
+    Route::delete('/report/delete/{zoneNumber}', [ReportController::class, 'deleteReport'])->name('report.delete');
+    Route::get('/zone-stats', [ReportController::class, 'zoneStats'])->name('zone.stats');
+    Route::get('/parking-detail/{zoneNumber}', [ParkingZoneController::class, 'show'])->name('parking.detail');
+});
 
 
 

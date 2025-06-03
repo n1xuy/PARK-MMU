@@ -30,12 +30,6 @@
             height: 30px;
         }
         
-        .title {
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
-        }
-        
         .card {
             width: 100%;
             max-width: 450px;
@@ -126,6 +120,13 @@
         .return-btn:hover {
             background-color: #f5f5f5;
         }
+
+        .error-message {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -135,18 +136,20 @@
         </div>
     </header>
     
-
     <div class="card">
         <h1>Login</h1>
         
         <form action="{{ route('userlogin') }}" method="POST">
+            @if(request()->has('redirect'))
+                <input type="hidden" name="redirect" value="{{ request()->input('redirect') }}">
+            @endif
             @csrf
 
             <div class="input-group">
                 <label for="username">Username</label>
-                <input type="text" id="username" name="username" required>
+                <input type="text" id="username" name="username" value="{{ old('username') }}" required>
                 @error('username')
-                <span style="color: red" class="error-message">{{ $message }}</span> 
+                    <span class="error-message">{{ $message }}</span> 
                 @enderror
             </div>
             
@@ -154,7 +157,7 @@
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required>
                 @error('password')
-                <span style="color: red" class="error-message">{{ $message }}</span>    
+                    <span class="error-message">{{ $message }}</span>    
                 @enderror
             </div>
             
@@ -162,13 +165,11 @@
             
             <div class="register-section">
                 <span class="register-text">Haven't registered yet? </span>
-                <a href="{{ route('student.register')}}">Register now</a>
+                <a href="{{ route('student.register') }}" class="register-link">Register now</a>
             </div>
             
             <a href="{{ route('home') }}" class="return-btn">RETURN</a>
         </form>
     </div>
-
-
 </body>
-</html> 
+</html>

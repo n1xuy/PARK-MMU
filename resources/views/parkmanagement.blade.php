@@ -1,196 +1,648 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Parking Management - MMU Parking Finder</title>
-    <link rel="stylesheet" href="{{ asset('css/admin-styles.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/parking-styles.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>MMU PARK - Admin Slot Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #1f2937;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #6b7280;
+            margin-bottom: 5px;
+        }
+
+        .header .info {
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+
+        .map-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            min-height: 600px;
+        }
+
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('MMUPARK.png');
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.3;
+            z-index: 1;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.2);
+            z-index: 2;
+        }
+
+        .interactive-layer {
+            position: relative;
+            z-index: 10;
+            min-height: 600px;
+            width: 100%;
+        }
+
+        .slot-button {
+            position: absolute;
+            border: 2px solid;
+            border-radius: 6px;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 20;
+        }
+
+        .slot-button:hover {
+            transform: scale(1.05);
+        }
+
+        .slot-button.available {
+            background-color: #10b981;
+            border-color: #059669;
+        }
+
+        .slot-button.available:hover {
+            background-color: #059669;
+        }
+
+        .slot-button.blocked {
+            background-color: #ef4444;
+            border-color: #dc2626;
+        }
+
+        .slot-button.blocked:hover {
+            background-color: #dc2626;
+        }
+
+        /* Specific clip-path for FOM button - creates an angled/diamond-like shape */
+        #topLeft1 {
+            clip-path: polygon(61% 0, 86% 0, 86% 92%, 7% 91%, 17% 32%);
+        }
+		
+		 #centralLeft1 {
+		    clip-path: polygon(42% 0, 86% 32%, 92% 53%, 51% 95%, 27% 94%, 26% 49%, 6% 27%, 6% 27%);
+		 }
+		 #centralLeft2 {
+		    clip-path: polygon(8% 2%, 78% 71%, 84% 67%, 94% 77%, 91% 97%, 16% 96%, 6% 41%);
+		 }
+		 #centralLeft3 {
+		    clip-path: polygon(0 29%, 26% 0, 99% 79%, 61% 100%);
+		 }
+		 #centralRight1 {
+		    clip-path: polygon(100% 10%, 100% 36%, 59% 36%, 38% 88%, 0 89%, 2% 11%);
+		 }
+		 #centralRight2 {
+		    clip-path: polygon(27% 0, 46% 0, 47% 100%, 29% 100%);
+		 }
+		 #centralRight3 {
+		    clip-path: polygon(27% 0, 46% 0, 47% 100%, 29% 100%);
+		 }
+		 #centralTop {
+		    clip-path: polygon(27% 0, 46% 0, 47% 100%, 29% 100%);
+		 }
+		 #centralBottom1 {
+		    clip-path: polygon(67% 0, 92% 6%, 17% 100%, 0 87%);
+		 }
+		 #centralBottom2 {
+		    clip-path: polygon(12% 4%, 85% 4%, 89% 91%, 49% 91%);
+		 }
+		 #centralBottom3 {
+		    clip-path: polygon(10% 21%, 90% 20%, 89% 67%, 9% 67%);
+		 }
+		 #centralBottom4 {
+		   clip-path: polygon(18% 38%, 41% 20%, 100% 73%, 78% 95%);
+		 }
+		 #bottomLeft2 {
+		   clip-path: polygon(0 24%, 100% 24%, 100% 44%, 0 43%);
+		 }
+		 #bottomRight1 {
+		   clip-path: polygon(0 24%, 100% 24%, 100% 44%, 0 43%);
+		 }
+		 #bottomRight2 {
+		   clip-path: polygon(18% 4%, 65% 4%, 65% 84%, 17% 84%);
+		 }
+		 #bottomRight3 {
+		   clip-path: polygon(18% 4%, 65% 4%, 65% 84%, 17% 84%);
+		 }
+		 #bottomRight4 {
+		   clip-path: polygon(24% 0, 48% 0, 51% 100%, 26% 100%);
+		 }
+		 #bottomRight5 {
+		   clip-path: polygon(24% 0, 58% 0, 58% 81%, 26% 81%);
+		 }
+		 
+
+        .status-panel {
+            margin-top: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-item {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .available-count {
+            color: #059669;
+        }
+
+        .blocked-count {
+            color: #dc2626;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            width: 400px;
+            max-width: 90vw;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: #dc2626;
+        }
+
+        .btn-primary:disabled {
+            background-color: #d1d5db;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background-color: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #4b5563;
+        }
+
+        /* Tooltip */
+        .slot-button[title]:hover::after {
+            content: attr(title);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            white-space: nowrap;
+            margin-bottom: 4px;
+            z-index: 1000;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .slot-button {
+                font-size: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="admin-container">
-        <div class="admin-header">
-            <div class="logo-section">
-                <img src="{{ asset('images/(1)LOGO.png') }}" alt="ParkMMU Logo" class="admin-logo">
-            </div>
-            <h1 class="admin-title">PARKING ZONE MANAGEMENT</h1>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>MMU PARK - Admin Slot Management</h1>
+            <p>Click GREEN areas on the map to block them | Click RED areas to unblock them</p>
+            <p class="info">Background: MMUPARK.png with interactive overlay buttons</p>
         </div>
-        
-        <div class="parking-content">
+
+        <!-- Map Container -->
+        <div class="map-container">
+            <!-- Background Image -->
+            <div class="background-image"></div>
             
-            <!-- Zone Management Form -->
-            <div class="zone-management-form">
-                <h2><i class="fas fa-parking"></i> Zone Management</h2>
+            <!-- Overlay -->
+            <div class="overlay"></div>
+            
+            <!-- Interactive Layer -->
+            <div class="interactive-layer">
+                <!-- Green Slot Buttons positioned over the map -->
                 
-                <form id="zoneForm">
-                    <input type="hidden" id="zoneId" name="zoneId">
-                    
-                    <div class="form-group">
-                        <label for="zoneName">Zone Name:</label>
-                        <input type="text" id="zoneName" name="zoneName" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="zoneLocation">Location:</label>
-                        <input type="text" id="zoneLocation" name="zoneLocation" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="totalSpaces">Total Spaces:</label>
-                        <input type="number" id="totalSpaces" name="totalSpaces" min="1" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="availableSpaces">Available Spaces:</label>
-                        <input type="number" id="availableSpaces" name="availableSpaces" min="0" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="zoneType">Zone Type:</label>
-                        <select id="zoneType" name="zoneType" required>
-                            <option value="student">Student Parking</option>
-                            <option value="staff">Staff Parking</option>
-                            <option value="disabled">Disabled Parking</option>
-                            <option value="visitor">Visitor Parking</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="zoneStatus">Status:</label>
-                        <select id="zoneStatus" name="zoneStatus" required>
-                            <option value="active">Active</option>
-                            <option value="maintenance">Under Maintenance</option>
-                            <option value="full">Full</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="button" id="saveZone" class="btn-primary"><i class="fas fa-save"></i> Save Zone</button>
-                        <button type="button" id="newZone" class="btn-secondary"><i class="fas fa-plus"></i> New Zone</button>
-                        <button type="button" id="deleteZone" class="btn-danger"><i class="fas fa-trash"></i> Delete Zone</button>
-                    </div>
-                </form>
-            </div>
-            
-            <!-- Zone List Table -->
-            <div class="zone-list">
-                <h2><i class="fas fa-list"></i> Existing Zones</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Zone ID</th>
-                            <th>Name</th>
-                            <th>Type</th>
-                            <th>Available</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="zoneTableBody">
-                        <!-- Zones will be populated here by JavaScript -->
-                        <tr>
-                            <td>Z001</td>
-                            <td>North Parking</td>
-                            <td>Student</td>
-                            <td>45/100</td>
-                            <td>Active</td>
-                            <td><button class="btn-edit" onclick="editZone('Z001')"><i class="fas fa-edit"></i></button></td>
-                        </tr>
-                        <tr>
-                            <td>Z002</td>
-                            <td>East Parking</td>
-                            <td>Staff</td>
-                            <td>12/50</td>
-                            <td>Active</td>
-                            <td><button class="btn-edit" onclick="editZone('Z002')"><i class="fas fa-edit"></i></button></td>
-                        </tr>
-                    </tbody>
-                </table>
+                <!-- Top left area slots -->
+                <div class="slot-button available" id="topLeft1" style="top: 30%; left: 37.5%; width: 5%; height: 6.7%;" title="Click to block this area">FOM</div>
+                
+                
+                <!-- Main central oval area - left side -->
+                <div class="slot-button available" id="centralLeft1" style="top: 23%; left: 50%; width: 5.8%; height: 8.3%;" title="Click to block this area">CL1</div>
+                <div class="slot-button available" id="centralLeft2" style="top: 43%; left: 39%; width: 5.8%; height: 8.3%;" title="Click to block this area">CL2</div>
+                <div class="slot-button available" id="centralLeft3" style="top: 68%; left: 40%; width: 5.8%; height: 8.3%;" title="Click to block this area">CL3</div>
+                
+                <!-- Main central oval area - right side -->
+                <div class="slot-button available" id="centralRight1" style="top: 63%; right: 38%; width: 5.8%; height: 8.3%;" title="Click to block this area">CR1</div>
+                <div class="slot-button available" id="centralRight2" style="top: 65%; right: 58%; width: 5.8%; height: 8.3%;" title="Click to block this area">CR2</div>
+                <div class="slot-button available" id="centralRight3" style="top: 53%; right: 53%; width: 5.8%; height: 8.3%;" title="Click to block this area">CR3</div>
+                
+                <!-- Central top area -->
+                <div class="slot-button available" id="centralTop" style="top: 50%; left: 52%; transform: translateX(-50%); width: 6.7%; height: 8.3%;" title="Click to block this area">CT</div>
+                
+                <!-- Central bottom areas -->
+                <div class="slot-button available" id="centralBottom1" style="top: 37%; left: 50%; width: 5%; height: 7.5%;" title="Click to block this area">CB1</div>
+                <div class="slot-button available" id="centralBottom2" style="top: 48%; left: 54%; width: 3%; height: 7.5%;" title="Click to block this area">CB2</div>
+                <div class="slot-button available" id="centralBottom3" style="top: 57%; right: 37%; width: 5%; height: 7.5%;" title="Click to block this area">CB3</div>
+                <div class="slot-button available" id="centralBottom4" style="top: 78%; right: 44%; width: 5%; height: 7.5%;" title="Click to block this area">CB4</div>
+                
+                <!-- Bottom left areas -->
+                <div class="slot-button available" id="bottomLeft1" style="top: 50%; left: 36%; width: 3%; height: 6.7%;" title="Click to block this area">BL1</div>
+                <div class="slot-button available" id="bottomLeft2" style="top: 68%; left: 63%; width: 5%; height: 6.7%;" title="Click to block this area">BL2</div>
+                
+                <!-- Bottom right extension areas -->
+                <div class="slot-button available" id="bottomRight1" style="top: 72%; right: 33%; width: 4.6%; height: 5.8%;" title="Click to block this area">BR1</div>
+                <div class="slot-button available" id="bottomRight2" style="top: 75%; right: 31%; width: 4.6%; height: 5.8%;" title="Click to block this area">BR2</div>
+                <div class="slot-button available" id="bottomRight3" style="top: 82%; right: 31%; width: 4.6%; height: 5.8%;" title="Click to block this area">BR3</div>
+                <div class="slot-button available" id="bottomRight4" style="top: 52%; right: 44%; width: 3%; height: 5.8%;" title="Click to block this area">BR4</div>
+                <div class="slot-button available" id="bottomRight5" style="top: 74%; right: 42%; width: 4%; height: 5.8%;" title="Click to block this area">BR5</div>
             </div>
         </div>
-        
-        <a href="{{ route('admin.menu') }}" class="back-button">
-            <img src="{{ asset('images/return page.png') }}" alt="Back">
-        </a>
+
+        <!-- Status Panel -->
+        <div class="status-panel">
+            <div class="status-row">
+                <div class="status-item">
+                    Available: <span class="available-count" id="availableCount">17</span>
+                </div>
+                <div class="status-item">
+                    Blocked: <span class="blocked-count" id="blockedCount">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Block Slot Modal -->
+    <div class="modal" id="blockModal">
+        <div class="modal-content">
+            <h3 class="modal-header" id="modalTitle">Block Slot</h3>
+            
+            <div class="form-group">
+                <label class="form-label" for="blockDate">📅 Block Date</label>
+                <input type="date" class="form-input" id="blockDate">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="blockTime">🕐 Block Time</label>
+                <input type="time" class="form-input" id="blockTime">
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-primary" id="confirmBlock">Block Slot</button>
+                <button class="btn btn-secondary" id="cancelBlock">Cancel</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Sample JavaScript for zone management functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            // New Zone button
-            document.getElementById('newZone').addEventListener('click', function() {
-                document.getElementById('zoneForm').reset();
-                document.getElementById('zoneId').value = '';
-            });
-            
-            // Save Zone button
-            document.getElementById('saveZone').addEventListener('click', function() {
-                // Here you would typically send the form data to your backend
-                const zoneData = {
-                    id: document.getElementById('zoneId').value,
-                    name: document.getElementById('zoneName').value,
-                    location: document.getElementById('zoneLocation').value,
-                    totalSpaces: document.getElementById('totalSpaces').value,
-                    availableSpaces: document.getElementById('availableSpaces').value,
-                    type: document.getElementById('zoneType').value,
-                    status: document.getElementById('zoneStatus').value
+        // Slot management system
+        const slots = {};
+        let selectedSlot = null;
+
+        // Initialize all slots
+        function initializeSlots() {
+            const slotElements = document.querySelectorAll('.slot-button');
+            slotElements.forEach(element => {
+                slots[element.id] = {
+                    id: element.id,
+                    name: element.textContent,
+                    blocked: false,
+                    blockDate: '',
+                    blockTime: '',
+                    element: element
                 };
                 
-                console.log('Saving zone:', zoneData);
-                alert('Zone saved successfully!');
-                // In a real application, you would call an API endpoint here
+                // Add click event listener
+                element.addEventListener('click', handleSlotClick);
             });
+            updateStatusCount();
+        }
+
+        // Handle slot button clicks
+        function handleSlotClick(event) {
+            const slotId = event.target.id;
+            const slot = slots[slotId];
             
-            // Delete Zone button
-            document.getElementById('deleteZone').addEventListener('click', function() {
-                const zoneId = document.getElementById('zoneId').value;
-                if (zoneId) {
-                    if (confirm('Are you sure you want to delete this zone?')) {
-                        console.log('Deleting zone:', zoneId);
-                        alert('Zone deleted successfully!');
-                        document.getElementById('zoneForm').reset();
-                        // In a real application, you would call an API endpoint here
-                    }
-                } else {
-                    alert('No zone selected to delete');
-                }
-            });
-        });
-        
-        function editZone(zoneId) {
-            // In a real application, you would fetch zone data from your backend
-            console.log('Editing zone:', zoneId);
-            
-            // Sample data - replace with actual data fetch
-            const sampleData = {
-                'Z001': {
-                    name: 'North Parking',
-                    location: 'North Campus, Block A',
-                    totalSpaces: 100,
-                    availableSpaces: 45,
-                    type: 'student',
-                    status: 'active'
-                },
-                'Z002': {
-                    name: 'East Parking',
-                    location: 'East Wing, Near Library',
-                    totalSpaces: 50,
-                    availableSpaces: 12,
-                    type: 'staff',
-                    status: 'active'
-                }
-            };
-            
-            if (sampleData[zoneId]) {
-                const zone = sampleData[zoneId];
-                document.getElementById('zoneId').value = zoneId;
-                document.getElementById('zoneName').value = zone.name;
-                document.getElementById('zoneLocation').value = zone.location;
-                document.getElementById('totalSpaces').value = zone.totalSpaces;
-                document.getElementById('availableSpaces').value = zone.availableSpaces;
-                document.getElementById('zoneType').value = zone.type;
-                document.getElementById('zoneStatus').value = zone.status;
+            if (slot.blocked) {
+                // Unblock the slot
+                unblockSlot(slotId);
+            } else {
+                // Show modal to block the slot
+                showBlockModal(slotId);
             }
         }
+
+        // Show block modal
+        function showBlockModal(slotId) {
+            selectedSlot = slotId;
+            const slot = slots[slotId];
+            
+            document.getElementById('modalTitle').textContent = `Block Slot: ${slot.name}`;
+            document.getElementById('blockDate').value = '';
+            document.getElementById('blockTime').value = '';
+            document.getElementById('blockModal').classList.add('show');
+            
+            // Set minimum date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('blockDate').min = today;
+        }
+
+        // Hide block modal
+        function hideBlockModal() {
+            document.getElementById('blockModal').classList.remove('show');
+            selectedSlot = null;
+        }
+        // Block a slot
+function blockSlot(slotId, date, time) {
+    fetch(route('slots.update', { slot: slotId }), {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            status: 'blocked',
+            block_date: date,
+            block_time: time
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const slot = slots[slotId];
+            slot.blocked = true;
+            slot.blockDate = date;
+            slot.blockTime = time;
+            
+            // Update visual appearance
+            slot.element.classList.remove('available');
+            slot.element.classList.add('blocked');
+            slot.element.innerHTML = '🔒';
+            slot.element.title = `Blocked until ${date} ${time} - Click to unblock`;
+            
+            updateStatusCount();
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// Unblock a slot
+function unblockSlot(slotId) {
+    fetch(route('slots.update', { slot: slotId }), {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            status: 'available',
+            block_date: null,
+            block_time: null
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const slot = slots[slotId];
+            slot.blocked = false;
+            slot.blockDate = '';
+            slot.blockTime = '';
+            
+            // Update visual appearance
+            slot.element.classList.remove('blocked');
+            slot.element.classList.add('available');
+            slot.element.innerHTML = slot.name;
+            slot.element.title = 'Click to block this area';
+            
+            updateStatusCount();
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+        // Block a slot
+        function blockSlot(slotId, date, time) {
+            const slot = slots[slotId];
+            slot.blocked = true;
+            slot.blockDate = date;
+            slot.blockTime = time;
+            
+            // Update visual appearance
+            slot.element.classList.remove('available');
+            slot.element.classList.add('blocked');
+            slot.element.innerHTML = '🔒';
+            slot.element.title = `Blocked until ${date} ${time} - Click to unblock`;
+            
+            updateStatusCount();
+        }
+
+        // Unblock a slot
+        function unblockSlot(slotId) {
+            const slot = slots[slotId];
+            slot.blocked = false;
+            slot.blockDate = '';
+            slot.blockTime = '';
+            
+            // Update visual appearance
+            slot.element.classList.remove('blocked');
+            slot.element.classList.add('available');
+            slot.element.innerHTML = slot.name;
+            slot.element.title = 'Click to block this area';
+            
+            updateStatusCount();
+        }
+
+        // Update status count
+        function updateStatusCount() {
+            const availableCount = Object.values(slots).filter(slot => !slot.blocked).length;
+            const blockedCount = Object.values(slots).filter(slot => slot.blocked).length;
+            
+            document.getElementById('availableCount').textContent = availableCount;
+            document.getElementById('blockedCount').textContent = blockedCount;
+        }
+
+        // Validate block form
+        function validateBlockForm() {
+            const date = document.getElementById('blockDate').value;
+            const time = document.getElementById('blockTime').value;
+            const confirmButton = document.getElementById('confirmBlock');
+            
+            if (date && time) {
+                confirmButton.disabled = false;
+            } else {
+                confirmButton.disabled = true;
+            }
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSlots();
+            
+            // Modal event listeners
+            document.getElementById('confirmBlock').addEventListener('click', function() {
+                const date = document.getElementById('blockDate').value;
+                const time = document.getElementById('blockTime').value;
+                
+                if (selectedSlot && date && time) {
+                    blockSlot(selectedSlot, date, time);
+                    hideBlockModal();
+                }
+            });
+            
+            document.getElementById('cancelBlock').addEventListener('click', hideBlockModal);
+            
+            // Form validation
+            document.getElementById('blockDate').addEventListener('input', validateBlockForm);
+            document.getElementById('blockTime').addEventListener('input', validateBlockForm);
+            
+            // Close modal when clicking outside
+            document.getElementById('blockModal').addEventListener('click', function(event) {
+                if (event.target === this) {
+                    hideBlockModal();
+                }
+            });
+            
+            // Initial form validation
+            validateBlockForm();
+        });
     </script>
 </body>
 </html>

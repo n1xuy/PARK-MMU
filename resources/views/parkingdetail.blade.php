@@ -3,6 +3,7 @@
 <head>
     <title>Parking Zone Detail - MMU Parking Finder</title>
     <link rel="stylesheet" href="{{ asset('css/announcement-styles.css') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <style>
         * {
             margin: 0;
@@ -101,6 +102,17 @@
             padding: 10px;
             border-radius: 30px;
         }
+
+        .btn-danger {
+            background-color: black;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
         
         .action-button {
             width: 50px;
@@ -118,6 +130,12 @@
         .action-button img {
             width: 25px;
             height: 25px;
+        }
+
+        .color-button.active {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
         }
         
         .report-section {
@@ -270,160 +288,150 @@
             <p class="report-label">Report Your Parking Zone</p>
             
         <div class="report-buttons">
-            <button class="color-button green-btn" onclick="submitReport(1)">Empty</button>
-            <button class="color-button orange-btn" onclick="submitReport(2)">Half-Full</button>
-            <button class="color-button red-btn" onclick="submitReport(3)">Full</button>
+            <button class="color-button green-btn" onclick="submitReport(1, event)">Empty</button>
+            <button class="color-button orange-btn" onclick="submitReport(2, event)">Half-Full</button>
+            <button class="color-button red-btn" onclick="submitReport(3, event)">Full</button>
             </div>
         <div class="logo-watermark">    
         <img src="{{ asset('images/(1)LOGO.png') }}" alt="Logo" class="footer-logo">
-    </div>
+        
+        @if (isset($zone) && 
+        \App\Models\Report::where('user_id', auth()->id())
+            ->where('parking_zone_id',$zone->id)
+            ->whereDate('created_at', now()->toDateString())
+            ->exists())
+        <form action="{{ route('report.delete', $zone->zone_number) }}" method="POST" onsubmit="return confirm('Delete your report?')">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-danger">Delete My Report</button>
+        </form>
+        @endif
+        </div>
     <?php
-    $currentZoneId = request()->query('zone', 1); //zoneid
-    $currentZone = $currentZone ?? \App\Models\ParkingZone::where('zone_number', 1)->first();
+    $currentZoneId = request()->query('zone', 1); 
+    $currentZone = $zone ?? \App\Models\ParkingZone::where('zone_number', 1)->first();
     ?>
     <script>
-        // Zone data
-        const currentZone = @json($currentZone ?? ['zone_number' => 1]);
-        const currentZoneNumber = currentZone.zone_number;
-        async function updateStats() {
-            try {
-                const response = await fetch(`/zone-stats?zone_id=${currentZoneNumber}`);
-                const data = await response.json();
-                console.log(data); 
-                const majority = getMajorityStatus(data);
-                let statusText = '-';
+    const currentZone = @json($zone ?? ['zone_number' => 1]);
+    const currentZoneNumber = currentZone.zone_number;
 
-                switch (majority) {
-                    case 'empty':
-                        statusText = 'Empty';
-                        break;
-                    case 'halfFull':
-                        statusText = 'Half-Full';
-                        break;
-                    case 'full':
-                        statusText = 'Full';
-                        break;
-                }
-
-                document.getElementById('currentStatus').textContent = statusText;
-                document.getElementById('totalReports').textContent = data.total_today;
-                document.getElementById('totalEmpty').textContent = data.total_empty;
-                document.getElementById('totalHalfFull').textContent = data.total_half_full;
-                document.getElementById('totalFull').textContent = data.total_full;
-                
-                if (data.last_report) {
-                    const lastReport = new Date(data.last_report.created_at);
-                    document.getElementById('lastReportTime').textContent = lastReport.toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-                    document.getElementById('lastReportDate').textContent = lastReport.toLocaleDateString([], {
-                        weekday: 'short',
-                        month: 'short',
-                        day: 'numeric'
-                    });
-                } else {
-                    document.getElementById('lastReportTime').textContent = 'Never';
-                    document.getElementById('lastReportDate').textContent = 'Never';
-                }
-                
-                setInterval(updateStats, 30000);
-                
-            } catch (error) {
-                console.error('Update error:', error);
-                setTimeout(updateStats, 5000);
-            }
-        }
-
-            function getMajorityStatus(data) {
+    async function updateStats() {
+        try {
+            const response = await fetch(`/zone-stats?parking_zone_id=${currentZoneNumber}`);
+            if (!response.ok) throw new Error('Network response was not ok');
+            
+            const data = await response.json();
+            
+            // Update all fields
+            document.getElementById('zoneName').textContent = `PARKING ZONE ${currentZoneNumber}`;
+            
+            // Determine current status
+            let statusText = 'No data';
+            if (data.total_today > 0) {
                 const counts = {
-                    empty: data.total_empty,
-                    halfFull: data.total_half_full,
-                    full: data.total_full
+                    'Empty': data.total_empty,
+                    'Half-Full': data.total_half_full,
+                    'Full': data.total_full
                 };
-                return Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
+                
+                const maxCount = Math.max(...Object.values(counts));
+                statusText = Object.keys(counts).find(key => counts[key] === maxCount);
             }
-        // Report submission
-        async function submitReport(status) {
-            if (!@json(auth()->check())) {
-                window.location.href = '/student-login?redirect=' + encodeURIComponent(window.location.pathname);
-                return;
-            }
-
-            const button = event.target;
-            button.disabled = true;
-            const originalText = button.textContent;
-            button.textContent = 'Sending...';
-
-            try {
-                const response = await fetch('/report-status', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        zone_id: currentZoneNumber,
-                        status: status
-                    })
+            
+            document.getElementById('currentStatus').textContent = statusText;
+            document.getElementById('totalReports').textContent = data.total_today || '0';
+            document.getElementById('totalEmpty').textContent = data.total_empty || '0';
+            document.getElementById('totalHalfFull').textContent = data.total_half_full || '0';
+            document.getElementById('totalFull').textContent = data.total_full || '0';
+            
+            if (data.last_report && data.last_report.created_at) {
+                const lastReport = new Date(data.last_report.created_at);
+                document.getElementById('lastReportTime').textContent = lastReport.toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit'
                 });
-
-                if (!response.ok) throw new Error('Failed to submit');
-                await updateStats();
-                alert('Report submitted!');
-            } catch (error) {
-                console.error(error);
-                alert('Error: ' + error.message);
-            } finally {
-                button.disabled = false;
-                button.textContent = originalText;
+                document.getElementById('lastReportDate').textContent = lastReport.toLocaleDateString([], {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            } else {
+                document.getElementById('lastReportTime').textContent = 'Never';
+                document.getElementById('lastReportDate').textContent = 'Never';
             }
+            
+        } catch (error) {
+            console.error('Update error:', error);
+            document.getElementById('currentStatus').textContent = 'Error loading';
+            setTimeout(updateStats, 5000); // Retry after 5 seconds
+        }
+    }
 
-            let statusId;
-            if (status === 1) statusId = 'totalEmpty';
-            else if (status === 2) statusId = 'totalHalfFull';
-            else if (status === 3) statusId = 'totalFull';
+    window.addEventListener('DOMContentLoaded', () => { 
+        updateStats();
+        setInterval(updateStats, 30000); // Update every 30 seconds
+    });
 
-            if (statusId) {
-                const element = document.getElementById(statusId);
-                element.classList.add('status-highlight');
-                setTimeout(() => {
-                    element.classList.remove('status-highlight');
-                }, 3000);
-            }
-
+    async function submitReport(status, event) {
+        // First check if user is authenticated
+        const isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};
+        
+        if (!isAuthenticated) {
+            window.location.href = '{{ route("student.login") }}?redirect=' + encodeURIComponent(window.location.href);
+            return;
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.parking-zone').forEach(zone => {
-                zone.style.cursor = 'pointer';
-                zone.addEventListener('click', function() {
-                    window.location.href = `/parking-detail/${this.getAttribute('data-zone')}`;
-                });
+        // Only proceed if user is authenticated
+        const button = event.target;
+        button.disabled = true;
+        
+        try {
+            const response = await fetch('/submit-report', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    zone_id: currentZoneNumber,
+                    status: status
+                })
             });
 
-            // Dropdown menu
-            const dropdownBtn = document.getElementById('userDropdownBtn');
-            if (dropdownBtn) {
-                dropdownBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    document.getElementById('dropdownContent').classList.toggle('show');
-                });
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to submit report');
             }
-        });
-            updateStats();
-
-        window.onclick = function(event) {
-            if (!event.target.matches('#userDropdownBtn')) {
-                const dropdowns = document.getElementsByClassName("dropdown-content");
-                for (let i = 0; i < dropdowns.length; i++) {
-                    const openDropdown = dropdowns[i];
-                    if (openDropdown.classList.contains('show')) {
-                        openDropdown.classList.remove('show');
-                    }
-                }
-            }
+            
+            // Update stats after successful submission
+            await updateStats();
+            
+            // Visual feedback
+            button.classList.add('active');
+            setTimeout(() => {
+                button.classList.remove('active');
+                button.disabled = false;
+            }, 2000);
+            
+        } catch (error) {
+            console.error('Error:', error);
+            alert(error.message);
+            button.disabled = false;
         }
+    }
+    function openGoogleMaps() {
+        // You'll need to add actual coordinates for each zone
+        const zoneCoordinates = {
+            1: "3.1234,101.5678",
+            2: "3.1235,101.5679",
+            // Add coordinates for all zones
+        };
+        
+        const coords = zoneCoordinates[currentZoneNumber] || "3.1234,101.5678";
+        window.open(`https://www.google.com/maps/search/?api=1&query=${coords}`);
+    }
     </script>
 </body>
 </html> 

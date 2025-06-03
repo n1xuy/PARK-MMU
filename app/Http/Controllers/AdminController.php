@@ -23,11 +23,17 @@ class AdminController extends Controller
             if ($admin && Hash::check($request->password, $admin->password)) {
                 Auth::guard('admin')->login($admin);
 
+            $admin = Auth::guard('admin')->user();
+
                 SystemLog::create([
+                    'admin_id' => $admin->id,
                     'description' => "Admin '{$admin->username}' logged in",
-                    'action' => 'Admin Login',
+                    'action' => 'Admin Login    ',
+                    'model' => 'Login',
                 ]);
 
+                $logs = SystemLog::with('admin')->latest()->get();
+                
                 return redirect()->route('admin.menu');
             }
 
@@ -57,6 +63,13 @@ class AdminController extends Controller
 
         $admin->password = Hash::make($request->new_password);
         $admin->save();
+
+        SystemLog::create([
+            'admin_id' => auth('admin')->id(),
+            'description' => "Admin '{$admin->username}' changed password",
+            'action' => 'Admin Change Password',
+            'model' => 'Change Password',
+        ]);
 
         return back()->with('success', 'Password updated successfully!');
     }

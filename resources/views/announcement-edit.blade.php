@@ -41,6 +41,10 @@
         .clear-button:hover {
             background-color: #c82333;
         }
+        .form-actions, .clear-button-form {
+            display: inline-block;
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
@@ -54,59 +58,60 @@
             <h1 class="admin-title">ADMIN</h1>
         </div>
         
-        <div class="announcement-content">
-            <h2 class="page-title">ANNOUNCEMENT EDIT</h2>   
+            <div class="announcement-content">
+                <h2 class="page-title">ANNOUNCEMENT {{ isset($announcement) ? 'EDIT' : 'CREATE' }}</h2>   
+                @php
+                    $isEditing = isset($announcement) && $announcement && !empty($announcement->title);
+                @endphp
 
-            @if (session('success'))
-                <div class="notice" id="notice">{{ session('success') }}</div>
-            @endif
-
-            @php
-                $isEditing = isset($announcement) && $announcement;
-            @endphp
-
-            <form class="announcement-form" method="POST"
-                  action="{{ $isEditing ? route('announcements.update', $announcement->id) : route('announcements.store') }}">
-                @csrf
-                @if($isEditing)
-                    @method('PUT')
+                @if (session('success'))
+                    <div class="notice" id="notice">{{ session('success') }}</div>
                 @endif
 
-                <div class="form-group">
-                    <label for="title">Title:</label>
-                    <input type="text" id="title" name="title"
-                           value="{{ old('title', $isEditing ? $announcement->title : '') }}" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="date">Date:</label>
-                    <input type="date" id="date" name="date"
-                           value="{{ old('date', $isEditing ? $announcement->date : '') }}" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="time">Time:</label>
-                    <input type="time" id="time" name="time"
-                           value="{{ old('time', $isEditing ? $announcement->time : '') }}" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="details">Details:</label>
-                    <textarea id="details" name="details" rows="6" required>{{ old('details', $isEditing ? $announcement->details : '') }}</textarea>
-                </div>
-
-                <div class="form-actions">
-                    <button class="save-button" type="submit">
-                        {{ $isEditing ? 'Update' : 'Create' }}
-                    </button>
-
-                    @if($isEditing)
-                    <form method="POST" action="{{ route('announcements.clear', ['id' => $announcement->id]) }}">
-                        @csrf
-                        <button type="submit" class="clear-button">Clear</button>
-                    </form>
+                <form class="announcement-form" method="POST"
+                    action="{{ $announcement->exists ? route('announcements.update', $announcement) : route('announcements.store') }}">
+                    @csrf
+                    @if($announcement->exists)
+                        @method('PUT')
                     @endif
-                </div>
+
+                    <div class="form-group">
+                        <label for="title">Title:</label>
+                        <input type="text" id="title" name="title"
+                            value="{{ old('title', $announcement->title ?? '') }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="date">Date:</label>
+                        <input type="date" id="date" name="date"
+                            value="{{ old('date', $announcement->date ?? '') }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="time">Time:</label>
+                        <input type="time" id="time" name="time"
+                            value="{{ old('time', $announcement->time ?? '') }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="details">Details:</label>
+                        <textarea id="details" name="details" rows="6" required>{{ old('details', $announcement->details ?? '') }}</textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button class="save-button" type="submit">
+                            {{ $announcement->exists ? 'Update' : 'Create' }}
+                        </button>
+                    </div>
+                </form>
+
+                @if ($announcement->id)
+                <form method="POST" action="{{ route('announcements.clear', $announcement)}}" style="margin-top: 10px;">
+                    @csrf
+                    <button type="submit" class="clear-button">Clear</button>
+                </form>
+                @endif
+            </div>
+
 
                 <div style="margin-top: 20px;">
                     <a href="{{ route('admin.menu') }}" class="back-button">

@@ -2,33 +2,42 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Announcement; // Add this line
+use App\Models\Admin;
+use App\Models\SystemLog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Announcement; // Add this line
 
 class AnnouncementController extends Controller
-{
-    public function create()
-    {
-        return view('announcement-edit');
+{   
+    public function handleAnnouncement()
+    {   
+        $announcement = Announcement::latest()->first() ?? new Announcement;
+        return view('announcement-edit', compact('announcement'));
     }
 
     public function update(Request $request, Announcement $announcement)
     {
         $validated = $request->validate([
-            'title' => 'required',
+            'title' => 'required|string|max:255',
             'date' => 'required|date',
             'time' => 'required',
-            'details' => 'required'
+            'details' => 'required|string'
         ]);
 
         $announcement->update($validated);
 
-        return redirect()->route('admin.announce')->with('success', 'Announcement updated successfully!');
-    }
+        $admin = Auth::guard('admin')->user();
 
-    public function edit(Announcement $announcement)
-    {       
-        return view ('announcement-edit', compact('announcement'));
+        SystemLog::create([
+            'admin_id' => $admin->id,
+            'description' => "Admin '{$admin->username}' updated the annoucement: {$announcement->title}",
+            'action' => 'Update',
+            'model' => 'Announcement',
+        ]);
+
+        return redirect()->route('admin.announce')
+            ->with('success', 'Announcement updated successfully!');
     }
 
     public function store(Request $request)
@@ -40,22 +49,46 @@ class AnnouncementController extends Controller
             'details' => 'required|string',
         ]);
 
-        Announcement::create($validated);
+        $validated['admin_id'] = auth('admin')->id();
+        
+        $announcement = Announcement::create($validated);
 
-        return redirect()->route('admin.announce')->with('success', 'Announcement created.');
+        $admin = Auth::guard('admin')->user();
+
+        SystemLog::create([
+            'admin_id' => $admin->id,
+            'description' => "Admin '{$admin->username}' created new announcement: {$announcement->title}",
+            'action' => 'Create',
+            'model' => 'Announcement',
+        ]);
+
+        $logs = SystemLog::with('admin')->latest()->get();
+
+        return redirect()
+            ->route('admin.announce')
+            ->with('success', 'Announcement created successfully!');
     }
 
-    public function clear($id)
+    public function clear(Announcement $announcement)
     {
-        $announcement = Announcement::findOrFail($id);
         $announcement->update([
-            'title' => '',
+            'title' => 'Welcome to ParkMMU!',
             'date' => null,
             'time' => null,
             'details' => '',
         ]);
 
-        return redirect()->back()->with('cleared', 'Announcement has been cleared.');
+        $admin = Auth::guard('admin')->user();
+
+        SystemLog::create([
+            'admin_id' => $admin->id,
+            'description' => "Admin '{$admin->username}' delete the annoucement: {$announcement->title}",
+            'action' => 'Delete',
+            'model' => 'Announcement',
+        ]);
+
+        return redirect()->route('admin.announce')
+            ->with('success', 'Announcement cleared successfully!');
     }
 
 }

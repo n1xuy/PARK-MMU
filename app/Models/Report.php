@@ -15,7 +15,7 @@ class Report extends Model
     protected static function booted()
     {
         static::creating(function ($report) {
-            $report->expires_at = now()->addHours(24); // Auto-expire in 2 hours
+            $report->expires_at = now()->addHours(24); 
         });
     }
 
@@ -24,12 +24,8 @@ class Report extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function zone()
-    {
-        return $this->belongsTo(ParkingZone::class, 'parking_zone_id');
-    }
     public function parkingZone()
     {
-        return $this->belongsTo(\App\Models\ParkingZone::class);
+        return $this->belongsTo(ParkingZone::class, 'parking_zone_id');
     }
 }
