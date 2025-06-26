@@ -6,20 +6,19 @@
 }
 
 html, body {
-  margin: 0;
-  padding: 0;
-  width: 100vw;
-  height: 100vh;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
 }
 
 body {
     background-color: #ffffff;
-    min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
 
 header {
+    flex-shrink: 0;
     background-color: #ffffff;
     padding: 1rem 2rem;
     display: flex;
@@ -61,10 +60,11 @@ header {
 }
 
 .announcement-bar {
+    flex-shrink: 0;
     background-color: #f9f9f9;
     border: 2px solid #ddd;
-    padding: 5px;
-    margin: 15px ;
+    padding: 0.1rem;
+    margin: 0.1rem 0 ;
     border-radius: 10px;
     text-align: center;
 }
@@ -81,7 +81,6 @@ header {
     color: black;
 }
 
-
 .announcement-content {
     display: inline-block;
 }
@@ -96,18 +95,24 @@ header {
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 2rem;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
     background-color: #fafafa;
+    overflow: hidden;
+    position: relative;
 }
 
 .map-container {
-    flex: 1;
-    margin-bottom: 2rem;
+    position: relative;
+    width: 90vw;
+    height: 90vh;
+    max-width: 1200px;
+    max-height: 1100px;
     background-color: #ffffff;
     border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     overflow: hidden;
-    position: relative;
 }
 
 .campus-map-bg {
@@ -135,7 +140,7 @@ header {
 .zone-marker {
     width: 40px;
     height: 40px;
-    background-color: #2196F3;
+    background-color: green;
     color: white;
     border-radius: 50%;
     display: flex;
@@ -170,10 +175,14 @@ header {
 }
 
 .legend {
+    flex-shrink: 0;
     background-color: #ffffff;
-    padding: 1.5rem;
+    padding: 1rem;
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    margin-top: 1rem;
+    width: 90vw;
+    max-width: 1200px;
 }
 
 .legend h3 {
@@ -206,30 +215,49 @@ header {
     border: 1px solid #e0e0e0;
 }
 
-.full-dnl, .full {
+.full {
     background-color: #f44336;
 }
-
-.h-full-dnl, .h-full {
-    background-color: #ff9800;
-}
-
-.empty-dnl, .empty {
-    background-color: #4caf50;
-}
-
-.staff {
-    background-color: #2196F3;
-}
-
-.free {
+.full-dnl {
     background: repeating-linear-gradient(
         45deg,
         #ffffff,
         #ffffff 5px,
-        #9e9e9e 5px,
-        #9e9e9e 10px
+        red  5px,
+        red 10px
     );
+}
+
+.h-full {
+    background-color: #ff9800;
+}
+
+.h-full-dnl {
+    background: repeating-linear-gradient(
+        45deg,
+        #ffffff,
+        #ffffff 5px,
+        #ff9800 5px,
+        #ff9800 10px
+    );
+}
+
+.empty {
+    background-color: #4caf50;
+}
+
+.empty-dnl {
+    background: repeating-linear-gradient(
+        45deg,
+        #ffffff,
+        #ffffff 5px,
+        #4caf50 5px,
+        #4caf50 10px
+    );
+}
+
+.staff {
+    background-color: #2196F3;
 }
 
 .logo-watermark {
@@ -254,39 +282,55 @@ header {
 }
 
 @media (max-width: 768px) {
+    .main-content {
+        padding: 0.5rem;
+    }
+    
+    .map-container {
+        width: 95vw;
+        height: 60vh;
+    }
+    
+    .legend {
+        width: 95vw;
+        padding: 0.5rem;
+    }
+    
     .legend-items {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.5rem;
     }
     
-    .parking-zone {
-        width: 40px;
-        height: 40px;
+    header {
+        padding: 0.5rem 1rem;
     }
     
-    .zone-marker {
-        width: 30px;
+    .logo-img {
         height: 30px;
-        font-size: 0.8rem;
+    }
+    
+    .login-btn {
+        padding: 0.3rem 1rem;
+        font-size: 0.9rem;
     }
 }
 
-@media (max-width: 480px) {
-    .main-content {
-        padding: 1rem;
+@media (max-width: 700px) {
+    .map-container {
+        width: 98vw;
+        height: 55vh;
     }
     
-    .legend-items {
-        grid-template-columns: 1fr;
+    .legend {
+        width: 98vw;
     }
     
-    .parking-zone {
-        width: 30px;
-        height: 30px;
+    .color-box {
+        width: 15px;
+        height: 15px;
     }
     
-    .zone-marker {
-        width: 25px;
-        height: 25px;
+    .legend-item span {
         font-size: 0.7rem;
     }
 }
@@ -472,8 +516,68 @@ transform: skewX(-45deg) scale(1, 1);
 .map-container > * {
     pointer-events: auto;
 }
+
 /* Status colors */
-.empty { background-color: #4CAF50; } /* Green */
-.h-full { background-color: #FF9800; } /* Orange */
-.full { background-color: #F44336; } /* Red */
-.staff { background-color: #2196F3; } /* Blue */
+.zone-status.empty {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.zone-status.h-full {
+    background-color: #FF9800;
+    color: white;
+}
+
+.zone-status.full {
+    background-color: #F44336;
+    color: white;
+}
+
+.zone-status.staff {
+    background-color: #2196F3;
+    color: white;
+}
+
+.parking-zone.blocked-zone {
+    filter: grayscale(100%);
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.zone-status.blocked {
+    background-color: #777 !important;
+    color: white !important;
+    border: 2px solid #ff0000;
+}
+
+.parking-zone.blocked-zone .zone-marker {
+    color: #ccc !important;
+}
+
+.fixed-ui {
+    position: fixed;
+    pointer-events: none; 
+    z-index: 100;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+/* Legend item for blocked zones */
+.legend-item .color-box.blocked {
+    background-color: #000000;
+    border: 1px solid #ff0000;
+}
+
+/* Make blocked zones more prominent */
+.parking-zone[data-is-blocked="true"] {
+    border: 2px solid #ff0000;
+    animation: blockBlink 2s infinite;
+}
+
+@keyframes blockBlink {
+    0% { border-color: #ff0000; }
+    50% { border-color: #000000; }
+    100% { border-color: #ff0000; }
+}

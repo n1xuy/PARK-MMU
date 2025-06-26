@@ -10,15 +10,21 @@ class Report extends Model
     const STATUS_HALF_FULL = 2;
     const STATUS_FULL = 3;
 
-    protected $fillable = ['user_id', 'parking_zone_id', 'status', 'expires_at'];
+    protected $fillable = [
+        'user_id', 
+        'parking_zone_id', 
+        'status', 
+        'expires_at'
+    ];
 
+    /*
     protected static function booted()
     {
         static::creating(function ($report) {
             $report->expires_at = now()->addHours(24); 
         });
     }
-
+    */
     public function user()
     {
         return $this->belongsTo(User::class);

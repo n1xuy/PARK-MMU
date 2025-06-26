@@ -4,6 +4,7 @@
     <title>System Logs - MMU Parking Finder</title>
     <link rel="stylesheet" href="{{ asset('css/admin-styles.css') }}">
     <link rel="stylesheet" href="{{ asset('css/logs-styles.css')}}" >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
     <div class="admin-container">
@@ -13,7 +14,9 @@
                 <img src="{{ asset('images/(1)LOGO.png') }}" alt="ParkMMU Logo" class="admin-logo">
                 </a>
             </div>
-            <h1 class="admin-title">ADMIN</h1>
+            <h1 class="admin-title">
+               ADMIN{{ Auth::guard('admin')->user()?->username ? ' - ' . Auth::guard('admin')->user()->username : '' }}
+            </h1>
         </div>
 
         <div class="logs-content">

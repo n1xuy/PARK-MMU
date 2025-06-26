@@ -1,647 +1,814 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
+    <title>Parking Management - Admin</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ asset('css/admin-styles.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/parkmanage.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>MMU PARK - Admin Slot Management</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f3f4f6;
-            padding: 20px;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .header {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .header h1 {
-            color: #1f2937;
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            color: #6b7280;
-            margin-bottom: 5px;
-        }
-
-        .header .info {
-            color: #9ca3af;
-            font-size: 0.875rem;
-        }
-
-        .map-container {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            position: relative;
-            overflow: hidden;
-            min-height: 600px;
-        }
-
-        .background-image {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: url('MMUPARK.png');
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            opacity: 0.3;
-            z-index: 1;
-        }
-
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.2);
-            z-index: 2;
-        }
-
-        .interactive-layer {
-            position: relative;
-            z-index: 10;
-            min-height: 600px;
-            width: 100%;
-        }
-
-        .slot-button {
-            position: absolute;
-            border: 2px solid;
-            border-radius: 6px;
-            color: white;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-            z-index: 20;
-        }
-
-        .slot-button:hover {
-            transform: scale(1.05);
-        }
-
-        .slot-button.available {
-            background-color: #10b981;
-            border-color: #059669;
-        }
-
-        .slot-button.available:hover {
-            background-color: #059669;
-        }
-
-        .slot-button.blocked {
-            background-color: #ef4444;
-            border-color: #dc2626;
-        }
-
-        .slot-button.blocked:hover {
-            background-color: #dc2626;
-        }
-
-        /* Specific clip-path for FOM button - creates an angled/diamond-like shape */
-        #topLeft1 {
-            clip-path: polygon(61% 0, 86% 0, 86% 92%, 7% 91%, 17% 32%);
-        }
-		
-		 #centralLeft1 {
-		    clip-path: polygon(42% 0, 86% 32%, 92% 53%, 51% 95%, 27% 94%, 26% 49%, 6% 27%, 6% 27%);
-		 }
-		 #centralLeft2 {
-		    clip-path: polygon(8% 2%, 78% 71%, 84% 67%, 94% 77%, 91% 97%, 16% 96%, 6% 41%);
-		 }
-		 #centralLeft3 {
-		    clip-path: polygon(0 29%, 26% 0, 99% 79%, 61% 100%);
-		 }
-		 #centralRight1 {
-		    clip-path: polygon(100% 10%, 100% 36%, 59% 36%, 38% 88%, 0 89%, 2% 11%);
-		 }
-		 #centralRight2 {
-		    clip-path: polygon(27% 0, 46% 0, 47% 100%, 29% 100%);
-		 }
-		 #centralRight3 {
-		    clip-path: polygon(27% 0, 46% 0, 47% 100%, 29% 100%);
-		 }
-		 #centralTop {
-		    clip-path: polygon(27% 0, 46% 0, 47% 100%, 29% 100%);
-		 }
-		 #centralBottom1 {
-		    clip-path: polygon(67% 0, 92% 6%, 17% 100%, 0 87%);
-		 }
-		 #centralBottom2 {
-		    clip-path: polygon(12% 4%, 85% 4%, 89% 91%, 49% 91%);
-		 }
-		 #centralBottom3 {
-		    clip-path: polygon(10% 21%, 90% 20%, 89% 67%, 9% 67%);
-		 }
-		 #centralBottom4 {
-		   clip-path: polygon(18% 38%, 41% 20%, 100% 73%, 78% 95%);
-		 }
-		 #bottomLeft2 {
-		   clip-path: polygon(0 24%, 100% 24%, 100% 44%, 0 43%);
-		 }
-		 #bottomRight1 {
-		   clip-path: polygon(0 24%, 100% 24%, 100% 44%, 0 43%);
-		 }
-		 #bottomRight2 {
-		   clip-path: polygon(18% 4%, 65% 4%, 65% 84%, 17% 84%);
-		 }
-		 #bottomRight3 {
-		   clip-path: polygon(18% 4%, 65% 4%, 65% 84%, 17% 84%);
-		 }
-		 #bottomRight4 {
-		   clip-path: polygon(24% 0, 48% 0, 51% 100%, 26% 100%);
-		 }
-		 #bottomRight5 {
-		   clip-path: polygon(24% 0, 58% 0, 58% 81%, 26% 81%);
-		 }
-		 
-
-        .status-panel {
-            margin-top: 20px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-        }
-
-        .status-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .status-item {
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .available-count {
-            color: #059669;
-        }
-
-        .blocked-count {
-            color: #dc2626;
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.show {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            width: 400px;
-            max-width: 90vw;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-
-        .modal-header {
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: #1f2937;
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 14px;
-            font-weight: 500;
-            color: #374151;
-            margin-bottom: 8px;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        .button-group {
-            display: flex;
-            gap: 12px;
-            margin-top: 24px;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 12px 16px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        .btn-primary {
-            background-color: #ef4444;
-            color: white;
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            background-color: #dc2626;
-        }
-
-        .btn-primary:disabled {
-            background-color: #d1d5db;
-            cursor: not-allowed;
-        }
-
-        .btn-secondary {
-            background-color: #6b7280;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background-color: #4b5563;
-        }
-
-        /* Tooltip */
-        .slot-button[title]:hover::after {
-            content: attr(title);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1f2937;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            white-space: nowrap;
-            margin-bottom: 4px;
-            z-index: 1000;
-        }
-
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            
-            .header h1 {
-                font-size: 1.5rem;
-            }
-            
-            .slot-button {
-                font-size: 10px;
-            }
-        }
-    </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>MMU PARK - Admin Slot Management</h1>
-            <p>Click GREEN areas on the map to block them | Click RED areas to unblock them</p>
-            <p class="info">Background: MMUPARK.png with interactive overlay buttons</p>
+    <div class="admin-container">
+        <div class="admin-header">
+            <div class="logo-section">
+                <a href="{{ route('home') }}">
+                    <img src="{{ asset('images/(1)LOGO.png') }}" alt="ParkMMU Logo" class="admin-logo">
+                </a>
+            </div>
+            <div class="admin-title">
+                ADMIN{{ Auth::guard('admin')->user()?->username ? ' - ' . Auth::guard('admin')->user()->username : '' }}
+            </div>
         </div>
+    
 
-        <!-- Map Container -->
-        <div class="map-container">
-            <!-- Background Image -->
-            <div class="background-image"></div>
-            
-            <!-- Overlay -->
-            <div class="overlay"></div>
-            
-            <!-- Interactive Layer -->
-            <div class="interactive-layer">
-                <!-- Green Slot Buttons positioned over the map -->
-                
-                <!-- Top left area slots -->
-                <div class="slot-button available" id="topLeft1" style="top: 30%; left: 37.5%; width: 5%; height: 6.7%;" title="Click to block this area">FOM</div>
-                
-                
-                <!-- Main central oval area - left side -->
-                <div class="slot-button available" id="centralLeft1" style="top: 23%; left: 50%; width: 5.8%; height: 8.3%;" title="Click to block this area">CL1</div>
-                <div class="slot-button available" id="centralLeft2" style="top: 43%; left: 39%; width: 5.8%; height: 8.3%;" title="Click to block this area">CL2</div>
-                <div class="slot-button available" id="centralLeft3" style="top: 68%; left: 40%; width: 5.8%; height: 8.3%;" title="Click to block this area">CL3</div>
-                
-                <!-- Main central oval area - right side -->
-                <div class="slot-button available" id="centralRight1" style="top: 63%; right: 38%; width: 5.8%; height: 8.3%;" title="Click to block this area">CR1</div>
-                <div class="slot-button available" id="centralRight2" style="top: 65%; right: 58%; width: 5.8%; height: 8.3%;" title="Click to block this area">CR2</div>
-                <div class="slot-button available" id="centralRight3" style="top: 53%; right: 53%; width: 5.8%; height: 8.3%;" title="Click to block this area">CR3</div>
-                
-                <!-- Central top area -->
-                <div class="slot-button available" id="centralTop" style="top: 50%; left: 52%; transform: translateX(-50%); width: 6.7%; height: 8.3%;" title="Click to block this area">CT</div>
-                
-                <!-- Central bottom areas -->
-                <div class="slot-button available" id="centralBottom1" style="top: 37%; left: 50%; width: 5%; height: 7.5%;" title="Click to block this area">CB1</div>
-                <div class="slot-button available" id="centralBottom2" style="top: 48%; left: 54%; width: 3%; height: 7.5%;" title="Click to block this area">CB2</div>
-                <div class="slot-button available" id="centralBottom3" style="top: 57%; right: 37%; width: 5%; height: 7.5%;" title="Click to block this area">CB3</div>
-                <div class="slot-button available" id="centralBottom4" style="top: 78%; right: 44%; width: 5%; height: 7.5%;" title="Click to block this area">CB4</div>
-                
-                <!-- Bottom left areas -->
-                <div class="slot-button available" id="bottomLeft1" style="top: 50%; left: 36%; width: 3%; height: 6.7%;" title="Click to block this area">BL1</div>
-                <div class="slot-button available" id="bottomLeft2" style="top: 68%; left: 63%; width: 5%; height: 6.7%;" title="Click to block this area">BL2</div>
-                
-                <!-- Bottom right extension areas -->
-                <div class="slot-button available" id="bottomRight1" style="top: 72%; right: 33%; width: 4.6%; height: 5.8%;" title="Click to block this area">BR1</div>
-                <div class="slot-button available" id="bottomRight2" style="top: 75%; right: 31%; width: 4.6%; height: 5.8%;" title="Click to block this area">BR2</div>
-                <div class="slot-button available" id="bottomRight3" style="top: 82%; right: 31%; width: 4.6%; height: 5.8%;" title="Click to block this area">BR3</div>
-                <div class="slot-button available" id="bottomRight4" style="top: 52%; right: 44%; width: 3%; height: 5.8%;" title="Click to block this area">BR4</div>
-                <div class="slot-button available" id="bottomRight5" style="top: 74%; right: 42%; width: 4%; height: 5.8%;" title="Click to block this area">BR5</div>
+        <div class="main-content">
+            <div class="map-container">
+                <div id="map"></div>
             </div>
         </div>
 
-        <!-- Status Panel -->
-        <div class="status-panel">
-            <div class="status-row">
-                <div class="status-item">
-                    Available: <span class="available-count" id="availableCount">17</span>
+        <div class="tabs-container">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('future')">Future Blocks</button>
+                <button class="tab" onclick="switchTab('history')">Block History</button>
+            </div>
+
+            <div id="future-tab" class="tab-content active">
+                <div class="search-filter">
+                    <input type="text" class="search-input" placeholder="Search by zone or reason..." id="future-search">
+                    <select class="filter-select" id="future-filter">
+                        <option value="">All Zones</option>
+                        <option value="student">Student Zones</option>
+                        <option value="staff">Staff Zones</option>
+                    </select>
+                    <button class="control-btn" onclick="loadFutureBlocks()">🔄 Refresh</button>
                 </div>
-                <div class="status-item">
-                    Blocked: <span class="blocked-count" id="blockedCount">0</span>
+                <div class="future-blocks-container" id="future-blocks">
+                    <div class="no-blocks">Loading future blocks...</div>
+                </div>
+            </div>
+
+            <div id="history-tab" class="tab-content">
+                <div class="search-filter">
+                    <input type="text" class="search-input" placeholder="Search history..." id="history-search">
+                    <select class="filter-select" id="history-status">
+                        <option value="">All Status</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                    <select class="filter-select" id="history-period">
+                        <option value="7">Last 7 days</option>
+                        <option value="30">Last 30 days</option>
+                        <option value="90">Last 3 months</option>
+                        <option value="">All time</option>
+                    </select>
+                    <button class="control-btn" onclick="loadHistory()">🔄 Refresh</button>
+                </div>
+                <div class="history-container" id="history-blocks">
+                    <div class="no-blocks">Loading block history...</div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Block Slot Modal -->
-    <div class="modal" id="blockModal">
-        <div class="modal-content">
-            <h3 class="modal-header" id="modalTitle">Block Slot</h3>
-            
-            <div class="form-group">
-                <label class="form-label" for="blockDate">📅 Block Date</label>
-                <input type="date" class="form-input" id="blockDate">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label" for="blockTime">🕐 Block Time</label>
-                <input type="time" class="form-input" id="blockTime">
-            </div>
-            
-            <div class="button-group">
-                <button class="btn btn-primary" id="confirmBlock">Block Slot</button>
-                <button class="btn btn-secondary" id="cancelBlock">Cancel</button>
+        <div id="blockModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2 id="modalZoneTitle">Block Parking Zone</h2>
+                <form id="blockForm" action="{{ route('admin.parking-blocks.store') }}" method="POST">
+                    @csrf
+                    <input type="hidden" id="zone_id" name="zone_id">
+                    <input type="hidden" id="edit_block_id" name="edit_block_id">
+                    
+                    <div class="form-group">
+                        <label for="reason">Details:</label>
+                        <textarea id="reason" name="reason" required placeholder="Enter reason for blocking this zone..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="date">Date:</label>
+                        <input type="date" id="date" name="date" required min="{{ date('Y-m-d') }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="start_time">Start Time:</label>
+                        <input type="time" id="start_time" name="start_time" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="end_time">End Time:</label>
+                        <input type="time" id="end_time" name="end_time" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="schedule_type">Schedule Type:</label>
+                        <select id="schedule_type" name="schedule_type" onchange="toggleScheduleOptions()">
+                            <option value="single">Single Day</option>
+                            <option value="weekly">Weekly Recurring</option>
+                        </select>
+                    </div>
+
+                    <div id="weekly-options" style="display: none;">
+                        <div class="form-group">
+                            <label>Days of Week:</label>
+                            <div class="checkbox-group">
+                                <label><input type="checkbox" name="weekly_days[]" value="1"> Monday</label>
+                                <label><input type="checkbox" name="weekly_days[]" value="2"> Tuesday</label>
+                                <label><input type="checkbox" name="weekly_days[]" value="3"> Wednesday</label>
+                                <label><input type="checkbox" name="weekly_days[]" value="4"> Thursday</label>
+                                <label><input type="checkbox" name="weekly_days[]" value="5"> Friday</label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="recurring_end_date">End Date:</label>
+                            <input type="date" id="recurring_end_date" name="recurring_end_date">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">Block Zone</button>
+                </form> 
             </div>
         </div>
-    </div>
 
+        <a href="{{ route('admin.menu') }}" class="back-button">
+        <img src="{{ asset('images/return page.png') }}" alt="Back">
+        </a>
+
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Slot management system
-        const slots = {};
-        let selectedSlot = null;
+        let map;
+        let markers = [];
+        let currentTileLayer;
+        let isStreetView = true;
+        let zonesData = [];
+        let parkingMarkers = [];
+        let isUpdatingMarkers = false;
+        const mmuCenter = [2.92802, 101.64193];
 
-        // Initialize all slots
-        function initializeSlots() {
-            const slotElements = document.querySelectorAll('.slot-button');
-            slotElements.forEach(element => {
-                slots[element.id] = {
-                    id: element.id,
-                    name: element.textContent,
-                    blocked: false,
-                    blockDate: '',
-                    blockTime: '',
-                    element: element
-                };
-                
-                // Add click event listener
-                element.addEventListener('click', handleSlotClick);
+        function initMap() {
+            try {
+                map = L.map('map', {
+                    center: mmuCenter,
+                    zoom: 18,
+                    zoomControl: true,
+                    attributionControl: true
+                });
+
+                currentTileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors',
+                    maxZoom: 20
+                }).addTo(map);
+
+                map.whenReady(function() {
+                    createParkingZoneMarkers();
+                });
+            } catch (error) {
+                console.error('Error initializing map:', error);
+                showError('Failed to load map. Please refresh the page.');
+            }
+        }
+
+        function createParkingZoneMarkers() {
+            fetch('/zones-for-map')
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    zonesData = data;
+                    createParkingMarkers();
+                })
+                .catch(error => {
+                    console.error('Error loading parking zones:', error);
+                    showError('Failed to load parking zones. Please refresh the page.');
+                });
+        }
+
+        function createParkingMarkers() {
+            // Clear existing markers
+            parkingMarkers.forEach(marker => {
+                if (map.hasLayer(marker)) {
+                    map.removeLayer(marker);
+                }
             });
-            updateStatusCount();
+            parkingMarkers = [];
+
+            if (!zonesData || !Array.isArray(zonesData)) {
+                console.error('Invalid zones data:', zonesData);
+                return;
+            }
+
+            zonesData.forEach(zone => {
+                if (!zone.latitude || !zone.longitude) return;
+
+                const isBlocked = zone.is_blocked || zone.current_status === 'blocked';
+                const markerColor = getMarkerColor(zone.current_status, zone.zone_type, isBlocked);
+                const statusText = getStatusText(zone.current_status, zone.zone_type, isBlocked);
+
+                const markerHtml = `
+                    <div style="
+                        background: ${markerColor};
+                        border: 3px solid #333;
+                        border-radius: 50%;
+                        width: 45px;
+                        height: 45px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-weight: bold;
+                        font-size: 15px;
+                        color: ${markerColor === '#ffc107' ? '#333' : 'white'};
+                        cursor: pointer;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                        transition: transform 0.2s;
+                    " onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                        P${zone.zone_number}
+                    </div>
+                `;
+
+                const marker = L.marker([zone.latitude, zone.longitude], {
+                    icon: L.divIcon({
+                        className: 'custom-parking-icon',
+                        html: markerHtml,
+                        iconSize: [40, 40],
+                        iconAnchor: [20, 20],
+                        popupAnchor: [0, -25]
+                    })
+                });
+
+                let popupContent = `
+                    <div style="text-align: center; padding: 10px; min-width: 200px;">
+                        <h4 style="margin: 0 0 8px 0; color: #333;">${zone.zone_name || 'Parking Zone ' + zone.zone_number}</h4>
+                        <div style="
+                            background: ${markerColor};
+                            color: ${markerColor === '#ffc107' ? '#333' : 'white'};
+                            padding: 4px 12px;
+                            border-radius: 15px;
+                            font-weight: bold;
+                            margin: 8px 0;
+                            display: inline-block;
+                        ">
+                            ${statusText}
+                        </div>
+                        <p style="margin: 4px 0; font-size: 12px;"><strong>Type:</strong> ${zone.zone_type.charAt(0).toUpperCase() + zone.zone_type.slice(1)}</p>
+                `;
+
+                if (isBlocked && zone.block_reason) {
+                    popupContent += `<p style="margin: 8px 0; font-size: 14px;"><strong>Reason:</strong> ${zone.block_reason}</p>`;
+                    
+                    if (zone.block_date) {
+                        popupContent += `<p style="margin: 4px 0; font-size: 12px;"><strong>Date:</strong> ${formatDate(zone.block_date)}</p>`;
+                    }
+                    
+                    if (zone.block_start_time && zone.block_end_time) {
+                        popupContent += `<p style="margin: 4px 0; font-size: 12px;"><strong>Time:</strong> ${formatTime(zone.block_start_time)} - ${formatTime(zone.block_end_time)}</p>`;
+                    }
+                }
+
+                if (zone.zone_type !== 'staff') {
+                    const buttonId = `btn-${zone.zone_id}`;
+                    if (isBlocked) {
+                        popupContent += `
+                            <button id="${buttonId}" onclick="unblockZone(${zone.zone_id}, '${zone.zone_number}')" style="
+                                background: #28a745;
+                                color: white;
+                                border: none;
+                                padding: 8px 16px;
+                                border-radius: 20px;
+                                cursor: pointer;
+                                margin-top: 8px;
+                                font-weight: 600;
+                            ">Unblock Zone</button>
+                        `;
+                    } else {
+                        popupContent += `
+                            <button onclick="openBlockModal(${zone.zone_id}, '${zone.zone_number}')" style="
+                                background: #dc3545;
+                                color: white;
+                                border: none;
+                                padding: 8px 16px;
+                                border-radius: 20px;
+                                cursor: pointer;
+                                margin-top: 8px;
+                                font-weight: 600;
+                            ">Block Zone</button>
+                        `;
+                    }
+                }
+
+                popupContent += '</div>';
+
+                marker.bindPopup(popupContent);
+                marker.addTo(map);
+                parkingMarkers.push(marker);
+            });
         }
 
-        // Handle slot button clicks
-        function handleSlotClick(event) {
-            const slotId = event.target.id;
-            const slot = slots[slotId];
+        function getMarkerColor(status, zoneType, isBlocked) {
+            if (isBlocked) return '#6c757d';
+            if (zoneType === 'staff') return '#2196F3';
             
-            if (slot.blocked) {
-                // Unblock the slot
-                unblockSlot(slotId);
+            switch(status) {
+                case 'full':
+                    return '#dc3545'; // Red
+                case 'half_full':
+                    return '#ffc107'; // Yellow
+                case 'empty':
+                case '':
+                default:
+                    return '#28a745'; // Green for empty/available
+            }
+        }   
+
+        function getStatusText(status, zoneType, isBlocked) {
+            if (isBlocked) return 'Blocked';
+            if (zoneType === 'staff') return 'Staff';
+            if (status === 'empty' || status === '') return 'AVAILABLE';
+            return status.toUpperCase().replace('_', '-');
+        }
+
+        function formatTime(timeString) {
+            if (!timeString) return 'N/A';
+            // Handle both HH:MM:SS and HH:MM formats
+            const timeParts = timeString.split(':');
+            const hours = parseInt(timeParts[0]);
+            const minutes = timeParts[1];
+            // Convert to 12-hour format
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const displayHours = hours % 12 || 12;
+            
+            return `${displayHours}:${minutes} ${ampm}`;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const dateObj = new Date(dateString);
+            // Malaysian date format: DD/MM/YYYY
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const year = dateObj.getFullYear();
+            
+            return `${day}/${month}/${year}`;
+        }
+
+        function displayFutureBlocks(blocks) {
+            const container = document.getElementById('future-blocks');
+            
+            if (!blocks || blocks.length === 0) {
+                container.innerHTML = '<div class="no-blocks">No future blocks scheduled</div>';
+                return;
+            }
+
+            let html = '<div class="future-blocks-list">';
+            
+            blocks.forEach(block => {
+                html += `
+                <div class="future-block-card">
+                    <div class="block-header">
+                        <span class="zone-badge">P${block.zone_number}</span>
+                        <span class="block-date">${formatDate(block.date)}</span>
+                        <button class="cancel-btn" onclick="cancelBlock(${block.id})">✖ Cancel</button>
+                    </div>
+                    <div class="block-details">
+                        <p><strong>Time:</strong> ${formatTime(block.start_time)} - ${formatTime(block.end_time)}</p>
+                        <p><strong>Reason:</strong> ${block.reason}</p>
+                        ${block.schedule_type === 'weekly' ? 
+                            `<p><strong>Recurring:</strong> Weekly on ${getDayNames(block.weekly_days)} until ${formatDate(block.recurring_end_date)}</p>` : ''}
+                    </div>
+                </div>
+                `;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function getDayNames(daysArray) {
+            if (!daysArray || !Array.isArray(daysArray)) return 'N/A';
+            const dayNames = ['', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+            return daysArray.map(day => dayNames[day]).join(', ');
+        }
+
+        function displayHistory(history) {
+            console.log('Displaying history:', history); // Debug log
+    
+            const container = document.getElementById('history-blocks');
+            
+            if (!container) {
+                console.error('Container element with id "history-blocks" not found!');
+                return;
+            }
+            
+            if (!history || history.length === 0) {
+                container.innerHTML = '<div class="no-blocks">No history records found</div>';
+                return;
+            }
+
+            let html = '<div class="history-list">';
+            
+            history.forEach((record, index) => {
+                console.log(`Processing record ${index}:`, record); // Debug log
+                
+                const timeText = record.start_time && record.end_time 
+                    ? `${formatTime(record.start_time)} - ${formatTime(record.end_time)}`
+                    : 'N/A';
+
+                const statusClass = record.status ? record.status.toLowerCase() : 'unknown';
+                const statusText = record.status ? 
+                    record.status.charAt(0).toUpperCase() + record.status.slice(1) : 'Unknown';
+
+                html += `
+                <div class="history-card ${statusClass}">
+                    <div class="history-header">
+                        <span class="zone-badge">P${record.zone_number || 'N/A'}</span>
+                        <span class="history-date">${formatDate(record.date)}</span>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </div>
+                    <div class="history-details">
+                        <p><strong>Time:</strong> ${timeText}</p>
+                        <p><strong>Reason:</strong> ${record.reason || 'N/A'}</p>
+                        <p><strong>Action by:</strong> ${record.admin_username || 'System'}</p>
+                        <p><strong>Action at:</strong> ${formatDateTime(record.created_at)}</p>
+                        ${record.schedule_type === 'weekly' ? 
+                            `<p><strong>Schedule:</strong> Weekly (${record.weekly_days ? getDayNames(record.weekly_days) : 'N/A'})</p>` : ''}
+                    </div>
+                </div>
+                `;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+            
+            console.log('History display completed');
+        }
+
+        function cancelBlock(blockId) {
+            if (!confirm('Are you sure you want to cancel this block?')) return;
+            
+            fetch(`/admin/zone-blocks/cancel/${blockId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert('Block cancelled successfully');
+                    loadFutureBlocks();
+                    updateMarkers();
+                } else {
+                    alert(data.message || 'Failed to cancel block');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while cancelling the block');
+            });
+        }
+
+        function formatDateTime(datetimeString) {
+            if (!datetimeString) return 'N/A';
+            
+            const dateObj = new Date(datetimeString);
+            // Malaysian datetime format: DD/MM/YYYY, HH:MM
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const year = dateObj.getFullYear();
+            const hours = String(dateObj.getHours()).padStart(2, '0');
+            const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+            
+            return `${day}/${month}/${year}, ${hours}:${minutes}`;
+        }
+
+        function toggleScheduleOptions() {
+            const scheduleType = document.getElementById('schedule_type').value;
+            const weeklyOptions = document.getElementById('weekly-options');
+            
+            if (scheduleType === 'weekly') {
+                weeklyOptions.style.display = 'block';
+                const defaultEndDate = new Date();
+                defaultEndDate.setDate(defaultEndDate.getDate() + 14);
+                document.getElementById('recurring_end_date').valueAsDate = defaultEndDate;
             } else {
-                // Show modal to block the slot
-                showBlockModal(slotId);
+                weeklyOptions.style.display = 'none';
             }
         }
 
-        // Show block modal
-        function showBlockModal(slotId) {
-            selectedSlot = slotId;
-            const slot = slots[slotId];
+        // Fixed openBlockModal function
+        window.openBlockModal = function(zoneId, zoneNumber, zoneName) {
+            const modal = document.getElementById('blockModal');
+            const zoneIdInput = document.getElementById('zone_id');
+            const modalTitle = document.getElementById('modalZoneTitle');
             
-            document.getElementById('modalTitle').textContent = `Block Slot: ${slot.name}`;
-            document.getElementById('blockDate').value = '';
-            document.getElementById('blockTime').value = '';
-            document.getElementById('blockModal').classList.add('show');
+            zoneIdInput.value = zoneId;
+            const displayName = zoneName && zoneName !== 'undefined' ? zoneName : `Zone P${zoneNumber}`;
+            modalTitle.textContent = `Block ${displayName}`;
+            document.getElementById('date').valueAsDate = new Date();
+            modal.style.display = 'block';
+        };
+
+        // Fixed unblockZone function with proper error handling and button state management
+        window.unblockZone = function(zoneId, zoneNumber) {
+            if (!confirm(`Confirm to unblock Zone P${zoneNumber}?`)) return;
+
+            const button = event.target;
+            const originalText = button.textContent;
             
-            // Set minimum date to today
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('blockDate').min = today;
+            // Set button to loading state
+            button.textContent = 'Unblocking...';
+            button.disabled = true;
+
+            const restoreButton = () => {
+                button.textContent = originalText;
+                button.disabled = false;
+            };
+
+            fetch(`/admin/zone-blocks/unblock/${zoneId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert(`Zone P${data.zone.number} unblocked and reset successfully!`);
+                    // Update both markers and future blocks
+                    return Promise.all([
+                        updateMarkers(),
+                        loadFutureBlocks()
+                    ]);
+                } else {
+                    restoreButton();
+                    alert(data.message || 'Failed to unblock the zone.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                restoreButton();
+                alert('An error occurred while unblocking.');
+            });
+        };
+
+        // Fixed updateMarkers function with race condition protection
+        function updateMarkers() {
+            if (isUpdatingMarkers) {
+                console.log('Update already in progress, skipping...');
+                return Promise.resolve();
+            }
+
+            isUpdatingMarkers = true;
+            
+            return fetch('/zones-for-map')
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Fresh zone data:', data);
+                    zonesData = data;
+                    createParkingMarkers();
+                    return data;
+                })
+                .catch(error => {
+                    console.error('Error updating markers:', error);
+                    throw error;
+                })
+                .finally(() => {
+                    isUpdatingMarkers = false;
+                });
         }
 
-        // Hide block modal
-        function hideBlockModal() {
-            document.getElementById('blockModal').classList.remove('show');
-            selectedSlot = null;
-        }
-        // Block a slot
-function blockSlot(slotId, date, time) {
-    fetch(route('slots.update', { slot: slotId }), {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        },
-        body: JSON.stringify({
-            status: 'blocked',
-            block_date: date,
-            block_time: time
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const slot = slots[slotId];
-            slot.blocked = true;
-            slot.blockDate = date;
-            slot.blockTime = time;
+        // Fixed switchTab function
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
             
-            // Update visual appearance
-            slot.element.classList.remove('available');
-            slot.element.classList.add('blocked');
-            slot.element.innerHTML = '🔒';
-            slot.element.title = `Blocked until ${date} ${time} - Click to unblock`;
+            const targetTab = document.getElementById(tabName + '-tab');
+            if (targetTab) {
+                targetTab.classList.add('active');
+            }
             
-            updateStatusCount();
-        }
-    })
-    .catch(error => console.error('Error:', error));
-}
+            event.target.classList.add('active');
+            
+            if (tabName === 'future') {
+                loadFutureBlocks();
+            } else if (tabName === 'history') {
+                loadHistory();
+            } 
+        };
 
-// Unblock a slot
-function unblockSlot(slotId) {
-    fetch(route('slots.update', { slot: slotId }), {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        },
-        body: JSON.stringify({
-            status: 'available',
-            block_date: null,
-            block_time: null
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const slot = slots[slotId];
-            slot.blocked = false;
-            slot.blockDate = '';
-            slot.blockTime = '';
+        // Fixed loadFutureBlocks with proper error handling
+        window.loadFutureBlocks = function() {
+            const search = document.getElementById('future-search')?.value || '';
+            const filter = document.getElementById('future-filter')?.value || '';
             
-            // Update visual appearance
-            slot.element.classList.remove('blocked');
-            slot.element.classList.add('available');
-            slot.element.innerHTML = slot.name;
-            slot.element.title = 'Click to block this area';
-            
-            updateStatusCount();
-        }
-    })
-    .catch(error => console.error('Error:', error));
-}
-        // Block a slot
-        function blockSlot(slotId, date, time) {
-            const slot = slots[slotId];
-            slot.blocked = true;
-            slot.blockDate = date;
-            slot.blockTime = time;
-            
-            // Update visual appearance
-            slot.element.classList.remove('available');
-            slot.element.classList.add('blocked');
-            slot.element.innerHTML = '🔒';
-            slot.element.title = `Blocked until ${date} ${time} - Click to unblock`;
-            
-            updateStatusCount();
-        }
+            fetch(`/admin/future-blocks?search=${encodeURIComponent(search)}&filter=${encodeURIComponent(filter)}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    displayFutureBlocks(data);
+                })
+                .catch(error => {
+                    console.error('Error loading future blocks:', error);
+                    const container = document.getElementById('future-blocks');
+                    if (container) {
+                        container.innerHTML = '<div class="no-blocks">Error loading future blocks. Please try again.</div>';
+                    }
+                });
+        };
 
-        // Unblock a slot
-        function unblockSlot(slotId) {
-            const slot = slots[slotId];
-            slot.blocked = false;
-            slot.blockDate = '';
-            slot.blockTime = '';
+        // Fixed loadHistory with proper error handling
+        window.loadHistory = function() {
+            const search = document.getElementById('history-search')?.value || '';
+            const status = document.getElementById('history-status')?.value || '';
+            const period = document.getElementById('history-period')?.value || '';
             
-            // Update visual appearance
-            slot.element.classList.remove('blocked');
-            slot.element.classList.add('available');
-            slot.element.innerHTML = slot.name;
-            slot.element.title = 'Click to block this area';
+            const url = `/admin/block-history?search=${encodeURIComponent(search)}&status=${encodeURIComponent(status)}&period=${encodeURIComponent(period)}`;
             
-            updateStatusCount();
-        }
+            console.log('Loading history from:', url);
+            
+            // Show loading state
+            const container = document.getElementById('history-blocks');
+            if (container) {
+                container.innerHTML = '<div class="loading">Loading history...</div>';
+            }
+            
+            fetch(url)
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    console.log('Response headers:', response.headers);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('API Response data:', data);
+                    console.log('Data type:', typeof data);
+                    console.log('Data length:', Array.isArray(data) ? data.length : 'Not an array');
+                    
+                    if (Array.isArray(data)) {
+                        console.log('First record:', data[0]);
+                    }
+                    
+                    displayHistory(data);
+                })
+                .catch(error => {
+                    console.error('Error details:', error);
+                    const container = document.getElementById('history-blocks');
+                    if (container) {
+                        container.innerHTML = `
+                            <div class="error">
+                                <p>Error loading history:</p>
+                                <p><strong>${error.message}</strong></p>
+                                <p>Check the browser console for more details.</p>
+                            </div>
+                        `;
+                    }
+                });
+        };
 
-        // Update status count
-        function updateStatusCount() {
-            const availableCount = Object.values(slots).filter(slot => !slot.blocked).length;
-            const blockedCount = Object.values(slots).filter(slot => slot.blocked).length;
-            
-            document.getElementById('availableCount').textContent = availableCount;
-            document.getElementById('blockedCount').textContent = blockedCount;
-        }
-
-        // Validate block form
-        function validateBlockForm() {
-            const date = document.getElementById('blockDate').value;
-            const time = document.getElementById('blockTime').value;
-            const confirmButton = document.getElementById('confirmBlock');
-            
-            if (date && time) {
-                confirmButton.disabled = false;
-            } else {
-                confirmButton.disabled = true;
+        function showError(message) {
+            const mapContainer = document.querySelector('.map-container');
+            if (mapContainer) {
+                mapContainer.innerHTML = `
+                    <div class="error-message">
+                        <strong>Error:</strong> ${message}
+                        <br><br>
+                        <button onclick="location.reload()" style="padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            Reload Page
+                        </button>
+                    </div>
+                `;
             }
         }
 
-        // Event listeners
         document.addEventListener('DOMContentLoaded', function() {
-            initializeSlots();
+            initMap();
+            loadFutureBlocks();
+            loadHistory();
+
+            const modal = document.getElementById('blockModal');
+            const closeBtn = document.querySelector('.close');
+            const form = document.getElementById('blockForm');
+            const MAX_BLOCK_HOURS = 24;
             
-            // Modal event listeners
-            document.getElementById('confirmBlock').addEventListener('click', function() {
-                const date = document.getElementById('blockDate').value;
-                const time = document.getElementById('blockTime').value;
-                
-                if (selectedSlot && date && time) {
-                    blockSlot(selectedSlot, date, time);
-                    hideBlockModal();
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    if (modal) modal.style.display = 'none';
+                });
+            }
+            
+            window.addEventListener('click', (event) => {
+                if (event.target === modal && modal) {
+                    modal.style.display = 'none';
                 }
             });
             
-            document.getElementById('cancelBlock').addEventListener('click', hideBlockModal);
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(form);
+                    
+                    const dateValue = formData.get('date');
+                    const startTimeValue = formData.get('start_time');
+                    const endTimeValue = formData.get('end_time');
+                    
+                    if (!dateValue || !startTimeValue || !endTimeValue) {
+                        alert("Please fill in all required fields");
+                        return;
+                    }
+                    
+                    const start = new Date(`${dateValue} ${startTimeValue}`);
+                    const end = new Date(`${dateValue} ${endTimeValue}`);
+                    
+                    if (end <= start) {
+                        alert("End time must be after start time");
+                        return;
+                    }
+                    
+                    if ((end - start) > (MAX_BLOCK_HOURS * 3600000)) {
+                        alert(`Blocks cannot exceed ${MAX_BLOCK_HOURS} hours`);
+                        return;
+                    }
+
+                    // Disable submit button during processing
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    const originalSubmitText = submitBtn.textContent;
+                    submitBtn.textContent = 'Processing...';
+                    submitBtn.disabled = true;
+
+                    fetch('/admin/zone-blocks/store', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            modal.style.display = 'none';
+                            form.reset();
+                            alert(`Zone P${data.zone.number} blocked successfully!`);
+                            
+                            // Update markers and future blocks
+                            Promise.all([
+                                updateMarkers(),
+                                loadFutureBlocks()
+                            ]).catch(error => {
+                                console.error('Error updating after block:', error);
+                            });
+                            
+                        } else {    
+                            alert(data.message || 'Failed to block parking zone');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred. Please try again.');
+                    })
+                    .finally(() => {
+                        // Restore submit button
+                        submitBtn.textContent = originalSubmitText;
+                        submitBtn.disabled = false;
+                    });
+                });
+            }
             
-            // Form validation
-            document.getElementById('blockDate').addEventListener('input', validateBlockForm);
-            document.getElementById('blockTime').addEventListener('input', validateBlockForm);
-            
-            // Close modal when clicking outside
-            document.getElementById('blockModal').addEventListener('click', function(event) {
-                if (event.target === this) {
-                    hideBlockModal();
-                }
-            });
-            
-            // Initial form validation
-            validateBlockForm();
+            // Set up periodic refresh with error handling
+            setInterval(() => {
+                updateMarkers().catch(error => {
+                    console.error('Periodic update failed:', error);
+                });
+            }, 30000);
         });
     </script>
 </body>

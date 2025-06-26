@@ -4,48 +4,7 @@
     <title>Announcement Edit - MMU Parking Finder</title>
     <link rel="stylesheet" href="{{ asset('css/admin-styles.css') }}">
     <link rel="stylesheet" href="{{ asset('css/announcement-styles.css') }}">
-    <style>
-        .notice {
-            background-color: #d4edda;
-            border: 1px solid #c3e6cb;
-            color: #155724;
-            padding: 12px;
-            margin-bottom: 16px;
-            border-radius: 8px;
-            font-weight: bold;
-            display: none;
-        }
-        .form-actions {
-            margin-top: 20px;
-            display: flex;
-            gap: 10px;
-        }
-        .save-button, .clear-button {
-            padding: 10px 18px;
-            font-size: 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        .save-button {
-            background-color: #28a745;
-            color: white;
-        }
-        .clear-button {
-            background-color: #dc3545;
-            color: white;
-        }
-        .save-button:hover {
-            background-color: #218838;
-        }
-        .clear-button:hover {
-            background-color: #c82333;
-        }
-        .form-actions, .clear-button-form {
-            display: inline-block;
-            margin-right: 10px;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
     <div class="admin-container">
@@ -55,9 +14,11 @@
                 <img src="{{ asset('images/(1)LOGO.png') }}" alt="ParkMMU Logo" class="admin-logo">
                 </a>
             </div>
-            <h1 class="admin-title">ADMIN</h1>
+            <div class="admin=title">
+                ADMIN{{ Auth::guard('admin')->user()?->username ? ' - ' . Auth::guard('admin')->user()->username : '' }}
+            </div>
         </div>
-        
+
             <div class="announcement-content">
                 <h2 class="page-title">ANNOUNCEMENT {{ isset($announcement) ? 'EDIT' : 'CREATE' }}</h2>   
                 @php

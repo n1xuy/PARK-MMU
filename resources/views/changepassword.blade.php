@@ -2,6 +2,8 @@
 <html>
 <head>
     <title>Admin Password Change</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ asset('css/admin-styles.css') }}">
     <style>
         * {
             margin: 0;
@@ -12,39 +14,16 @@
         
         body {
             background-color: white;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
+            min-height: 100vh;
+            display: block;
         }
         
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            border-bottom: 1px solid #ccc;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-        }
-        
-        .logo img {
-            height: 30px;
-            margin-right: 10px;
-        }
-        
-        .admin-title {
-            font-size: 24px;
-            font-weight: bold;
-        }
-        
-        .card {
-            width: 100%;
-            max-width: 450px;
-            margin: 40px auto;
-            padding: 20px;
+        @media (max-width: 600px) {
+            .card {
+                margin: 24px 8px;
+                max-width: 100vw;
+                padding: 16px;
+            }
         }
         
         h1 {
@@ -129,14 +108,16 @@
     </style>
 </head>
 <body>
-    <header>
-        <div class="logo">
-            <a href ="{{ route('home') }}">
-            <img src="{{ asset('images/(1)LOGO.png') }}" alt="Logo">
+        <div class="admin-header">
+        <div class="logo-section">
+            <a href="{{ route('home') }}">
+                <img src="{{ asset('images/(1)LOGO.png') }}" alt="Logo" class="admin-logo">
             </a>
         </div>
-        <div class="admin-title">ADMIN</div>
-    </header>
+        <div class="admin-title">
+            ADMIN{{ Auth::guard('admin')->user()?->username ? ' - ' . Auth::guard('admin')->user()->username : '' }}
+        </div>
+    </div>
 
     <div class="card">
         <h1>Change Password</h1>

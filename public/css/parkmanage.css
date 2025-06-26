@@ -1,0 +1,318 @@
+/* Responsive CSS without media queries - works on all screen sizes */
+.admin-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.admin-header {
+    flex-shrink: 0;
+}
+
+.main-content {
+    flex: 0 0 auto;
+}
+
+.map-container {
+    width: 100%;
+    height: 55vh; /* 55% of viewport height */
+    flex-shrink: 0;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+    background: #f0f0f0;
+}
+
+.tabs-container {
+     flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.tabs {
+    display: flex;
+    border-bottom: 2px solid #ddd;
+    flex-shrink: 0;
+    height: min(60px, 8vh); /* Responsive tab height */
+}
+
+.tab {
+    flex: 1;
+    padding: min(20px, 3vh) min(15px, 2vw);
+    text-align: center;
+    font-size: clamp(14px, 3vw, 18px); /* Responsive font size */
+    font-weight: 600;
+    background: #f5f5f5;
+    border: none;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tab.active {
+    background: white;
+    border-bottom: 3px solid #007AFF;
+    color: #007AFF;
+}
+
+.tab-content {
+    display: none;
+    flex: 1;
+    padding: min(15px, 2vh);
+    overflow-y: auto;
+    min-height: 0;
+    height: calc(45vh - min(60px, 8vh)); /* Fill remaining space exactly */
+}
+
+.tab-content.active {
+    display: block;
+    height: calc(45vh - min(60px, 8vh)); /* Fill remaining space exactly */
+}
+
+/* Block Card Styles - Responsive */
+.future-block-card, .history-card {
+    background: white;
+    border-radius: min(15px, 2vw);
+    padding: clamp(15px, 3vw, 20px);
+    margin-bottom: min(15px, 2vh);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    border-left: 5px solid #007AFF;
+    font-size: clamp(14px, 2.5vw, 16px);
+}
+
+.history-card.completed {
+    border-left-color: #28a745;
+}
+
+.history-card.cancelled {
+    border-left-color: #dc3545;
+}
+
+.block-header, .history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: min(10px, 1vh);
+    flex-wrap: wrap;
+    gap: min(10px, 1vh);
+}
+
+.zone-badge {
+    background: #333;
+    color: white;
+    padding: min(5px, 1vh) min(15px, 3vw);
+    border-radius: min(20px, 3vw);
+    font-weight: bold;
+    font-size: clamp(12px, 2.5vw, 14px);
+}
+
+.block-date, .history-date {
+    font-weight: 600;
+    color: #666;
+    font-size: clamp(12px, 2.5vw, 14px);
+}
+
+.cancel-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: min(5px, 1vh) min(10px, 2vw);
+    border-radius: min(15px, 2vw);
+    cursor: pointer;
+    font-size: clamp(12px, 2.5vw, 14px);
+    transition: all 0.2s ease;
+    min-height: 44px; /* Touch-friendly */
+}
+
+.cancel-btn:hover {
+    background: #c82333;
+}
+
+.status-badge {
+    padding: min(5px, 1vh) min(10px, 2vw);
+    border-radius: min(15px, 2vw);
+    font-size: clamp(12px, 2.5vw, 14px);
+    font-weight: bold;
+}
+
+.status-badge.completed {
+    background: #28a745;
+    color: white;
+}
+
+.status-badge.cancelled {
+    background: #dc3545;
+    color: white;
+}
+
+/* Search and Filter Styles - Responsive */
+.search-filter {
+    display: flex;
+    gap: min(10px, 2vw);
+    margin-bottom: min(20px, 3vh);
+    flex-wrap: wrap;
+    flex-shrink: 0;
+}
+
+.search-input, .filter-select {
+    flex: 1;
+    min-width: min(150px, 35vw);
+    padding: min(15px, 2vh);
+    border: 2px solid #ddd;
+    border-radius: min(10px, 2vw);
+    font-size: max(16px, 3vw); /* Prevents zoom on iOS */
+    min-height: 44px; /* Touch-friendly */
+    box-sizing: border-box;
+}
+
+.control-btn {
+    background: #007AFF;
+    color: white;
+    border: none;
+    padding: min(15px, 2vh) min(20px, 3vw);
+    border-radius: min(10px, 2vw);
+    cursor: pointer;
+    font-size: clamp(14px, 3vw, 16px);
+    transition: all 0.2s ease;
+    min-height: 44px; /* Touch-friendly */
+    white-space: nowrap;
+}
+
+.control-btn:hover {
+    background: #0069d9;
+}
+
+/* Modal Styles - Responsive */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    overflow-y: auto;
+    padding: min(20px, 5vh);
+    box-sizing: border-box;
+}
+
+.modal-content {
+    background: white;
+    margin: min(50px, 10vh) auto;
+    padding: clamp(20px, 5vw, 30px);
+    border-radius: min(15px, 3vw);
+    width: min(90vw, 500px);
+    max-width: 500px;
+    position: relative;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.close {
+    position: absolute;
+    top: min(15px, 3vh);
+    right: min(15px, 3vw);
+    font-size: clamp(24px, 5vw, 28px);
+    cursor: pointer;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.submit-btn {
+    background: #007AFF;
+    color: white;
+    border: none;
+    padding: min(20px, 3vh);
+    border-radius: min(10px, 2vw);
+    cursor: pointer;
+    font-size: clamp(16px, 3vw, 18px);
+    font-weight: 600;
+    width: 100%;
+    transition: all 0.2s ease;
+    min-height: 50px;
+}
+
+.submit-btn:hover {
+    background: #0069d9;
+}
+
+/* Checkbox Group Styles - Responsive */
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: min(10px, 2vw);
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: min(5px, 1vw);
+    cursor: pointer;
+    font-size: clamp(14px, 3vw, 16px);
+    padding: min(5px, 1vh);
+    min-height: 44px;
+}
+
+/* Loading States - Responsive */
+.loading, .no-blocks {
+    text-align: center;
+    padding: clamp(20px, 5vh, 40px);
+    color: #666;
+    font-size: clamp(16px, 3vw, 18px);
+}
+
+.error-message {
+    background: #f8d7da;
+    color: #721c24;
+    padding: clamp(15px, 3vh, 20px);
+    border-radius: min(10px, 2vw);
+    margin: clamp(15px, 3vh, 20px);
+    text-align: center;
+    font-size: clamp(14px, 3vw, 16px);
+}
+
+/* Force small screen behavior for narrow viewports */
+.search-filter {
+    flex-direction: column;
+}
+
+.search-input, .filter-select, .control-btn {
+    width: 100%;
+}
+
+/* Ensure proper touch targets on all devices */
+button, input, select, .tab {
+    min-height: 44px;
+    min-width: 44px;
+}
+
+@media (max-width: 600px) {
+    .main-content {
+        flex: 0 0 auto;
+    }
+    .map-container {
+        height: 50vh !important; /* or adjust as needed */
+        min-height: 160px !important;
+        max-height: 450px !important;
+    }
+    .tabs-container {
+        flex: 1 1 0;
+        min-height: 0;
+        height: auto;
+    }
+    .tab-content {
+        height: 100%;
+        max-height: none;
+        overflow-y: auto;
+    }
+}

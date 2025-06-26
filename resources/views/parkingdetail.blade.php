@@ -2,224 +2,13 @@
 <html>
 <head>
     <title>Parking Zone Detail - MMU Parking Finder</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ asset('css/announcement-styles.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/parkingdetails.css') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-        }
-        
-        body {
-            background-color: white;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        header {
-            display: flex;
-            flex-direction: row;
-            justify-content: flex-start;
-            align-items: center;
-            padding: 15px 20px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .logo {
-            height: 35px;
-        }
-        
-        @keyframes slide {
-            0% {
-                transform: translateX(100%);
-            }
-            100% {
-                transform: translateX(-100%);
-            }
-        }
-        
-        .zone-detail-container {
-            width: 100%;
-            max-width: 450px;
-            margin: 0 auto;
-            padding: 20px;
-            position: relative;
-        }
-        
-        .zone-name-container {
-            background-color: #e0e0e0;
-            border-radius: 25px;
-            padding: 15px;
-            text-align: center;
-            margin: 20px 0;
-        }
-        
-        .zone-name {
-            font-size: 22px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-        
-        .zone-info {
-            margin: 20px 0;
-        }
-        
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 6px 0;
-        }
-        
-        .info-label {
-            font-weight: bold;
-            text-transform: uppercase;
-            font-size: 14px;
-        }
-        
-        .info-value {
-            font-size: 14px;
-        }
-        
-        .report-label {
-            text-align: center;
-            margin-bottom: 15px;
-            font-size: 12px;
-            color: #666;
-        }
-        
-        .button-container {
-            position: fixed;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            background-color: #e0e0e0;
-            padding: 10px;
-            border-radius: 30px;
-        }
-
-        .btn-danger {
-            background-color: black;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-            margin-top: 10px;
-            width: 100%;
-        }
-        
-        .action-button {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: none;
-            background-color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        .action-button img {
-            width: 25px;
-            height: 25px;
-        }
-
-        .color-button.active {
-            transform: scale(1.1);
-            box-shadow: 0 0 15px rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
-        }
-        
-        .report-section {
-            margin-top: 150px;
-            background-color: #e0e0e0;
-            border-radius: 25px;
-            padding: 15px;
-            overflow: hidden;
-        }
-        
-        .report-buttons {
-            display: flex;
-            justify-content: space-around;
-            padding: 20px 0;
-        }
-        
-        .color-button {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
-            text-indent: -9999px;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        .green-btn {
-            background-color: #4CAF50;
-        }
-        
-        .orange-btn {
-            background-color: #FF9800;
-        }
-        
-        .red-btn {
-            background-color: #F44336;
-        }
-        
-        .report-btn {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            border: none;
-            background-color: #e0e0e0;
-            color: #333;
-            text-align: center;
-            font-size: 16px;
-            font-weight: bold;
-            text-transform: uppercase;
-            border-top: 1px solid #ccc;
-            cursor: pointer;
-        }
-        
-        .footer-logo {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            width: 70px;
-            opacity: 0.5;
-        }
-
-        .color-button.active {
-            border: 3px solid #000 !important;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        }
-
-        .color-button:hover {
-            opacity: 0.9;
-        }
-
-        .status-highlight {
-        font-weight: bold;
-        animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.7; }
-            100% { opacity: 1; }
-        }
-    </style>
 </head>
 <body>
+
     <header>
         <div class="logo-section">
             <a href ="{{ route('home') }}">
@@ -230,7 +19,7 @@
 
     <div class="zone-detail-container">
         <div class="zone-name-container">
-            <h1 class="zone-name" id="zoneName">PARKING ZONE 1</h1>
+            <h1 class="zone-name" id="zoneName">  {{ $coordinates['name'] ?? 'Zone '. $zoneNumber}} </h1>
         </div>
         
         <div>
@@ -241,37 +30,37 @@
             <div class="info-row">
                 <div class="info-label">CURRENT STATUS</div>
                 <div class="info-value">:</div>
-                <div class="info-value" id="currentStatus">-</div>
+                <div class="info-value" style="color: {{ $status_color }}" id="currentStatus">{{ strtoupper($currentStatus) }}</div>
             </div>
             <div class="info-row">
                 <div class="info-label">LAST REPORT TIME</div>
                 <div class="info-value">:</div>
-                <div class="info-value" id="lastReportTime">-</div>
+                <div class="info-value" id="lastReportTime">{{ $lastReport ? $lastReport->created_at->format('h:i A') : 'Never' }}</div>
             </div>
             <div class="info-row">
                 <div class="info-label">LAST REPORT DATE</div>
                 <div class="info-value">:</div>
-                <div class="info-value" id="lastReportDate">-</div>
+                <div class="info-value" id="lastReportDate"> {{ $lastReport ? $lastReport->created_at->format('M d, Y') : 'Never' }}</div>
             </div>
             <div class="info-row">
                 <div class="info-label">TOTAL REPORT TODAY</div>
                 <div class="info-value">:</div>
-                <div class="info-value" id="totalReports">-</div>
+                <div class="info-value" id="totalReports">{{ $totals['total'] }}</div>
             </div>
             <div class="info-row">
                 <div class="info-label">TOTAL REPORT (FULL)</div>
                 <div class="info-value">:</div>
-                <div class="info-value" id="totalFull">-</div>
+                <div class="info-value" id="totalFull">{{ $totals['full'] }}</div>
             </div>
             <div class="info-row">
                 <div class="info-label">TOTAL REPORT (HALF-FULL)</div>
                 <div class="info-value">:</div>
-                <div class="info-value" id="totalHalfFull">-</div>
+                <div class="info-value" id="totalHalfFull">{{ $totals['half_full'] }}</div>
             </div>
             <div class="info-row">
                 <div class="info-label">TOTAL REPORT (EMPTY)</div>
                 <div class="info-value">:</div>
-                <div class="info-value" id="totalEmpty">-</div>
+                <div class="info-value" id="totalEmpty">{{ $totals['empty'] }}</div>
             </div>
         </div>
         
@@ -283,78 +72,60 @@
                 <img src="images/location.png" alt="Location" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\'><path d=\'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z\' fill=\'%23333333\'/></svg>'">
             </button>
         </div>
+
+        <div id="loginNotification" class="login-notification">
+            Please login to submit a report
+        </div>
         
         <div class="report-section">
             <p class="report-label">Report Your Parking Zone</p>
             
-        <div class="report-buttons">
-            <button class="color-button green-btn" onclick="submitReport(1, event)">Empty</button>
-            <button class="color-button orange-btn" onclick="submitReport(2, event)">Half-Full</button>
-            <button class="color-button red-btn" onclick="submitReport(3, event)">Full</button>
+            <div class="report-buttons">
+                <button class="color-button green-btn" data-status="1" onclick="submitReport(1, event)">Empty</button>
+                <button class="color-button orange-btn" data-status="2" onclick="submitReport(2, event)">Half-Full</button>
+                <button class="color-button red-btn" data-status="3" onclick="submitReport(3, event)">Full</button>
             </div>
-        <div class="logo-watermark">    
-        <img src="{{ asset('images/(1)LOGO.png') }}" alt="Logo" class="footer-logo">
-        
-        @if (isset($zone) && 
-        \App\Models\Report::where('user_id', auth()->id())
-            ->where('parking_zone_id',$zone->id)
-            ->whereDate('created_at', now()->toDateString())
-            ->exists())
-        <form action="{{ route('report.delete', $zone->zone_number) }}" method="POST" onsubmit="return confirm('Delete your report?')">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-danger">Delete My Report</button>
-        </form>
-        @endif
+
+            <div class="delete-report-container" id="deleteReportContainer" style="display: none;">
+                <button class="btn-danger" onclick="deleteReport()">Retrieve</button>
+            </div>
         </div>
-    <?php
-    $currentZoneId = request()->query('zone', 1); 
-    $currentZone = $zone ?? \App\Models\ParkingZone::where('zone_number', 1)->first();
-    ?>
+        
+        <div class="logo-watermark">    
+            <img src="{{ asset('images/(1)LOGO.png') }}" alt="Logo" class="footer-logo">
+        </div>
+
     <script>
-    const currentZone = @json($zone ?? ['zone_number' => 1]);
+    const currentZone = {
+        zone_number: {{ $zoneNumber }},
+        zone_type: "{{ $zone->zone_type }}",
+        zone_name: "{{ $coordinates['name'] ?? 'Zone ' . $zoneNumber }}"    
+    };
     const currentZoneNumber = currentZone.zone_number;
+    const initialStatus = "{{ $currentStatus }}";
+    const initialStatusColor = "{{ $status_color }}";
+    const currentZoneName = currentZone.zone_name;
+
+    let currentUserStatus = null;
 
     async function updateStats() {
         try {
-            const response = await fetch(`/zone-stats?parking_zone_id=${currentZoneNumber}`);
+            const response = await fetch(`{{ route('zone.stats') }}?zone_id=${currentZoneNumber}`);
             if (!response.ok) throw new Error('Network response was not ok');
             
             const data = await response.json();
             
-            // Update all fields
-            document.getElementById('zoneName').textContent = `PARKING ZONE ${currentZoneNumber}`;
-            
-            // Determine current status
-            let statusText = 'No data';
-            if (data.total_today > 0) {
-                const counts = {
-                    'Empty': data.total_empty,
-                    'Half-Full': data.total_half_full,
-                    'Full': data.total_full
-                };
-                
-                const maxCount = Math.max(...Object.values(counts));
-                statusText = Object.keys(counts).find(key => counts[key] === maxCount);
-            }
-            
-            document.getElementById('currentStatus').textContent = statusText;
+            document.getElementById('zoneName').textContent = currentZone.zone_name;
+            document.getElementById('currentStatus').textContent = data.status.toUpperCase();
+            document.getElementById('currentStatus').style.color = data.status_color;
             document.getElementById('totalReports').textContent = data.total_today || '0';
             document.getElementById('totalEmpty').textContent = data.total_empty || '0';
             document.getElementById('totalHalfFull').textContent = data.total_half_full || '0';
             document.getElementById('totalFull').textContent = data.total_full || '0';
             
-            if (data.last_report && data.last_report.created_at) {
-                const lastReport = new Date(data.last_report.created_at);
-                document.getElementById('lastReportTime').textContent = lastReport.toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-                document.getElementById('lastReportDate').textContent = lastReport.toLocaleDateString([], {
-                    weekday: 'short',
-                    month: 'short',
-                    day: 'numeric'
-                });
+            if (data.last_report) {
+                document.getElementById('lastReportTime').textContent = data.last_report.time || '-';
+                document.getElementById('lastReportDate').textContent = data.last_report.date || '-';
             } else {
                 document.getElementById('lastReportTime').textContent = 'Never';
                 document.getElementById('lastReportDate').textContent = 'Never';
@@ -362,32 +133,64 @@
             
         } catch (error) {
             console.error('Update error:', error);
-            document.getElementById('currentStatus').textContent = 'Error loading';
-            setTimeout(updateStats, 5000); // Retry after 5 seconds
         }
     }
 
     window.addEventListener('DOMContentLoaded', () => { 
-        updateStats();
         setInterval(updateStats, 30000); // Update every 30 seconds
+        
+        // Check user report status on page load
+        checkUserReport();
     });
+
+    function showLoginNotification() {
+        const notification = document.getElementById('loginNotification');
+        notification.classList.add('show');
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, 3000); // Hide after 3 seconds
+    }
 
     async function submitReport(status, event) {
         // First check if user is authenticated
         const isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};
-        
+
         if (!isAuthenticated) {
-            window.location.href = '{{ route("student.login") }}?redirect=' + encodeURIComponent(window.location.href);
+            showLoginNotification();
+            setTimeout(() => {
+                window.location.href = '{{ route("student.login") }}?redirect=' + encodeURIComponent(window.location.href);
+            }, 1000);
             return;
         }
 
-        // Only proceed if user is authenticated
         const button = event.target;
-        button.disabled = true;
+        const allButtons = document.querySelectorAll('.color-button');
         
+        // Disable all buttons during submission
+        if (currentUserStatus === status) {
+        
+        // Disable all buttons during submission
+        allButtons.forEach(btn => {
+            btn.disabled = false;
+            btn.classList.add('disabled');
+        });
+        return;
+        }
         try {
-            const response = await fetch('/submit-report', {
-                method: 'POST',
+            let endpoint, method;
+            
+            if (currentUserStatus !== null) {
+                // User is switching their report - use update endpoint
+                endpoint = '/update-report';
+                method = 'PUT';
+            } else {
+                // User is submitting a new report
+                endpoint = '/submit-report';
+                method = 'POST';
+            }
+
+            const response = await fetch(endpoint, {
+                method: method,
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
@@ -404,34 +207,202 @@
             if (!response.ok) {
                 throw new Error(data.message || 'Failed to submit report');
             }
+
+            // Update all UI elements with the new data
+            document.getElementById('currentStatus').textContent = data.status.toUpperCase();
+            document.getElementById('currentStatus').style.color = data.status_color;
+            document.getElementById('totalReports').textContent = data.totals.total;
+            document.getElementById('totalEmpty').textContent = data.totals.empty;
+            document.getElementById('totalHalfFull').textContent = data.totals.half_full;
+            document.getElementById('totalFull').textContent = data.totals.full;
             
-            // Update stats after successful submission
-            await updateStats();
+            if (data.last_report) {
+                document.getElementById('lastReportTime').textContent = data.last_report.time;
+                document.getElementById('lastReportDate').textContent = data.last_report.date;
+            }
             
-            // Visual feedback
-            button.classList.add('active');
-            setTimeout(() => {
-                button.classList.remove('active');
-                button.disabled = false;
-            }, 2000);
+            updateButtonSelection(status);
+            const previousStatus = currentUserStatus;
+            currentUserStatus = status;
+            
+            document.getElementById('deleteReportContainer').style.display = 'block';
+
+            const actionText = currentUserStatus === null ? 'submitted' : 'updated';
+            showNotification('Report submitted successfully!', 'success');
             
         } catch (error) {
             console.error('Error:', error);
-            alert(error.message);
-            button.disabled = false;
+            showNotification(error.message || 'Failed to submit report', 'error');
+        } finally {
+            // Re-enable buttons
+            allButtons.forEach(btn => {
+                btn.disabled = false;
+                btn.classList.remove('disabled');
+            });
         }
     }
+
+    function updateButtonSelection(selectedStatus) {
+        const allButtons = document.querySelectorAll('.color-button');
+        allButtons.forEach(btn => {
+            btn.classList.remove('selected');
+        });
+
+        const selectedButton = document.querySelector(`[data-status="${selectedStatus}"]`);
+        if (selectedButton) {
+            selectedButton.classList.add('selected');
+        }
+    }
+
+    async function checkUserReport() {
+        try {
+            const response = await fetch(`/check-report/${currentZoneNumber}`);
+            if (!response.ok) throw new Error('Failed to check report status');
+            
+            const data = await response.json();
+            
+            if (data.hasReport && data.status) {
+                currentUserStatus = data.status;
+                updateButtonSelection(data.status);
+                document.getElementById('deleteReportContainer').style.display = 'block';
+            } else {
+                currentUserStatus = null;
+                document.querySelectorAll('.color-button').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+                document.getElementById('deleteReportContainer').style.display = 'none';
+            }
+        } catch (error) {
+            console.error('Error checking report:', error);
+
+            currentUserStatus = null;
+            document.querySelectorAll('.color-button').forEach(btn => {
+            btn.classList.remove('selected');
+            });
+            document.getElementById('deleteReportContainer').style.display = 'none';
+        }
+    }
+
+    async function deleteReport() {
+        if (!confirm('Are you sure you want to delete your report?')) return;
+        
+        try {
+            const response = await fetch(`/report/delete/${currentZoneNumber}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json',
+                }
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to delete report');
+            }
+
+            // Update stats and UI after deletion
+            await updateStats();
+            currentUserStatus = null;
+
+            document.querySelectorAll('.color-button').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+
+            document.getElementById('deleteReportContainer').style.display = 'none';
+            
+            showNotification('Report deleted successfully!', 'success');
+
+        } catch (error) {
+            console.error('Error deleting report:', error);
+            showNotification(error.message || 'Failed to delete report', 'error');
+        }
+    }
+
+    // Notification styles  
+    const style = document.createElement('style');
+    style.textContent = `
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 4px;
+            color: white;
+            z-index: 1000;
+            opacity: 0;
+            animation: fadeIn 0.3s forwards;
+        }
+        .notification.success {
+            background-color: #4CAF50;
+        }
+        .notification.error {
+            background-color: #F44336;
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; top: 30px; }
+        }
+        .fade-out {
+            animation: fadeOut 0.3s forwards;
+        }
+        @keyframes fadeOut {
+            to { opacity: 0; top: 20px; }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Helper function to show notifications
+    function showNotification(message, type = 'success') {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        // Auto-remove after 3 seconds
+        setTimeout(() => {
+            notification.classList.add('fade-out');
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+
     function openGoogleMaps() {
         // You'll need to add actual coordinates for each zone
         const zoneCoordinates = {
-            1: "3.1234,101.5678",
-            2: "3.1235,101.5679",
-            // Add coordinates for all zones
+            1: "2.92824,101.64086",
+            2: "2.92951,101.64075",
+            3: "2.93038,101.64132",
+            4: "2.93016,101.64275",
+            5: "2.92776,101.64315",
+            6: "2.92797,101.64350", 
+            7: "2.92689,101.64457",
+            8: "2.92440,101.64567",
+            9: "2.92554,101.64111",
+            10: "2.92742,101.64112",  
+            11: "2.92758,101.64005", 
+            12: "2.9274014,101.6426726", 
+            13: "2.925160,101.6458500",     
+            14: "2.92475,101.6431829", 
+            15: "2.92595,101.6437733", 
+            16: "2.92611,101.64039", 
+            17: "2.92900,101.6428055", 
+            18: "2.92551,101.64541", 
+            19: "2.92842,101.63918", 
+            20: "2.9251259,101.642052",  
+            21: "2.9265186,101.6430174", 
+            22: "2.9264535,101.6409169", 
+            23: "2.92770,101.63925", 
         };
         
-        const coords = zoneCoordinates[currentZoneNumber] || "3.1234,101.5678";
+        const coords = zoneCoordinates[currentZoneNumber];
         window.open(`https://www.google.com/maps/search/?api=1&query=${coords}`);
     }
+
+    // Initialize everything when page loads
+    updateStats();
+    checkUserReport();
+
+
     </script>
 </body>
-</html> 
+</html>

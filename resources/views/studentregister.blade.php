@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Student Registration - MMU Parking Finder</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         * {
             margin: 0;

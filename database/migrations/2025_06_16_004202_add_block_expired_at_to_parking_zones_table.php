@@ -12,11 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('parking_zones', function (Blueprint $table) {
-            $table->integer('total_empty')->default(0)->after('total_reports');
-            $table->integer('total_half_full')->default(0)->after('total_empty');
-            $table->integer('total_full')->default(0)->after('total_half_full');
-        });    
-        
+            $table->timestamp('block_expires_at')->nullable()->after('block_end_time');
+        });
     }
 
     /**
@@ -25,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('parking_zones', function (Blueprint $table) {
-            $table->dropColumn(['total_empty', 'total_half_full', 'total_full']);
+            $table->dropColumn('block_expires_at');
         });
     }
 };

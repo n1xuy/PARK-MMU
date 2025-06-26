@@ -10,99 +10,115 @@ use App\Http\Controllers\SystemLogController;
 use App\Http\Controllers\ReportDataController;
 use App\Http\Controllers\ParkingZoneController;
 use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\ParkManageController;
+
+// ============================================
+// PUBLIC ROUTES
+// ============================================
 
 Route::get('/', function () {
-    $announcement = \App\Models\Announcement::latest()->first(); 
-    return view('home',compact('announcement'));
+    $announcement = Announcement::latest()->first();
+    
+    // Preload zones with their reports for today
+    $zones = \App\Models\ParkingZone::with(['reports' => function($query) {
+        $query->whereDate('created_at', today());
+    }])->orderBy('zone_number')->get();
+    
+    // Precalculate statuses
+    $controller = app(\App\Http\Controllers\ParkingZoneController::class);
+    $zones->each(function ($zone) use ($controller) {
+        $zone->calculated_status = $controller->calculateReliableStatus($zone);
+        $zone->status_label = $controller->getStatusLabel($zone->calculated_status);
+    });
+
+    return view('home', compact('announcement', 'zones'));
 })->name('home');
 
+// Student Authentication Routes
 Route::get('/student-login', function () {
     return view('studentlogin');
 })->name('student.login');
 
-Route::post('/student-login',[UserController::class,'login'])->name('userlogin');
+Route::post('/student-login', [UserController::class, 'login'])->name('userlogin');
 
 Route::get('/student-register', function() {
     return view('studentregister');
 })->name('student.register');
 
-Route::post('/student-register',[UserController::class, 'registration'])->name('registration');
+Route::post('/student-register', [UserController::class, 'registration'])->name('registration');
 
-Route::get('/admin-login', function(){
-    return view('adminlogin');
-})->name('admin.login');
+// Admin Authentication Routes
+Route::post('/admin-login', [AdminController::class, 'login'])->name('adminlogin');
 
-Route::get('/login', function () {
-    return redirect()->route('admin.login');
-})->name('login');
+// Logout Route
+Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 
-Route::post('/admin-login',[AdminController::class, 'login'])->name('adminlogin');
+// Public Parking Information Routes
+Route::get('/parking-detail/{zoneNumber}', [ParkingZoneController::class, 'show'])->name('parking.detail');
+Route::get('/zone-stats', [ParkingZoneController::class, 'getZoneStats'])->name('zone.stats');
+Route::get('/zone-statuses', [ParkingZoneController::class, 'getAllZoneStatuses']);
+Route::get('/zones-for-map', [ParkingZoneController::class, 'getZonesForMap']);
 
-Route::middleware(['auth:admin'])->group(function(){
-Route::get('/admin/change-password',[AdminController::class,'showChangePasswordForm'])->name('admin.changepw');
-Route::post('/admin/change-password', [AdminController::class, 'updatePassword'])->name('admin.pwupdate');
+// API Route for announcements
+Route::get('/announcements', function () {
+    return \App\Models\Announcement::all();
 });
 
+// Auto unblock route (can be called by cron jobs)
+Route::post('/auto-unblock-expired', [ParkManageController::class, 'triggerAutoUnblock'])->name('auto-unblock-expired');
+
+// ============================================
+// AUTHENTICATED USER ROUTES
+// ============================================
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/submit-report', [ReportController::class, 'submitReport']);
+    Route::delete('/report/delete/{zoneNumber}', [ReportController::class, 'deleteReport'])->name('report.delete'); 
+    Route::get('/check-report/{zoneNumber}', [ReportController::class, 'checkUserReport'])->name('report.check');
+    Route::put('/update-report', [ReportController::class, 'updateReport'])->name('update-report');
+    Route::post('/report-status', [ReportController::class, 'submitReport'])->name('report.submit');
+});
+
+// ============================================
+// ADMIN ROUTES (NO MIDDLEWARE PROTECTION)
+// ============================================
+
+// Admin Dashboard
 Route::get('/admin', function(){
     $announcement = Announcement::latest()->first(); 
     return view('admin', compact('announcement'));
 })->name('admin.menu');
 
-Route::get('/admin-parkmanage', function(){
-    return view('parkmanagement');
-})-> name('admin.parkmanage');
+// Admin Password Management
+Route::get('/admin/change-password', [AdminController::class, 'showChangePasswordForm'])->name('admin.changepw');
+Route::post('/admin/change-password', [AdminController::class, 'updatePassword'])->name('admin.pwupdate');
 
-Route::get('/admin-logs', function(){
-    return view('systemlogs');
-})-> name('admin.syslogs');
-
-Route::get('/admin-changepassword', function(){
-    return view('changepassword');
-})-> name('admin.changepw');
-
-Route::get('/parkinginfo', function(){
-    return view('parkingdetail');
-})-> name('parkinfo');
-
-Route::post('/logout', [UserController::class, 'logout'])->name('logout');
-
-//report function route
-Route::get('/zone-stats', [ParkingZoneController::class, 'getZoneStats']);
-Route::post('/report-status', [ReportController::class, 'reportStatus'])
-    ->middleware('auth')
-    ->name('report.submit');
-
-Route::post('/submit-report', [ReportController::class, 'reportStatus'])
-    ->middleware('auth');
-
-
-Route::get('/parking-detail/{zone_number}', [ParkingZoneController::class, 'show'])
-     ->name('parkinfo');
-
+// System Logs
 Route::get('/admin-logs', [SystemLogController::class, 'index'])->name('admin.syslogs');
 
-Route::get('/announcements', function () {
-    return \App\Models\Announcement::all();
-});
-
-
-Route::prefix('admin')->middleware('auth:admin')->group(function () {
-    Route::get('/announcement', [AnnouncementController::class, 'handleAnnouncement'])->name('admin.announce');
-    Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
-    Route::put('/announcements/{announcement}', [AnnouncementController::class, 'update'])->name('announcements.update');
-    Route::post('/announcements/{announcement}/clear', [AnnouncementController::class, 'clear'])->name('announcements.clear');
-});
-
-
+// Report Data
 Route::get('/admin-reportdata', [ReportDataController::class, 'index'])->name('admin.report');
 
+// Admin Announcements
+Route::get('/admin/announcement', [AnnouncementController::class, 'handleAnnouncement'])->name('admin.announce');
+Route::post('/admin/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
+Route::put('/admin/announcements/{announcement}', [AnnouncementController::class, 'update'])->name('announcements.update');
+Route::post('/admin/announcements/{announcement}/clear', [AnnouncementController::class, 'clear'])->name('announcements.clear');
 
-Route::middleware(['auth'])->group(function () {
-    Route::post('/submit-report', [ReportController::class, 'reportStatus'])->name('report.status');
-    Route::delete('/report/delete/{zoneNumber}', [ReportController::class, 'deleteReport'])->name('report.delete');
-    Route::get('/zone-stats', [ReportController::class, 'zoneStats'])->name('zone.stats');
-    Route::get('/parking-detail/{zoneNumber}', [ParkingZoneController::class, 'show'])->name('parking.detail');
+// Zone Management
+Route::get('/admin/zone-blocks', [ParkManageController::class, 'index'])->name('zoneblocks.index');
+Route::post('/admin/zone-blocks/store', [ParkManageController::class, 'store'])->name('admin.parking-blocks.store');
+Route::post('/admin/zone-blocks/store-recurring', [ParkManageController::class, 'storeRecurring']);
+Route::post('/admin/zone-blocks/unblock/{zone}', [ParkManageController::class, 'unblock'])->name('zoneblocks.unblock');
+Route::post('/admin/auto-unblock', [ParkManageController::class, 'triggerAutoUnblock'])->name('admin.auto-unblock');
+
+// Zone Status & Statistics
+Route::get('/admin/zone-statuses', [ParkingZoneController::class, 'getZoneStatus']);
+Route::get('/admin/future-blocks', [ParkManageController::class, 'getFutureBlocks'])->name('admin.future-blocks');
+Route::get('/admin/block-history', [ParkManageController::class, 'getBlockHistory'])->name('admin.block-history');
+Route::get('/admin/block-stats', [ParkManageController::class, 'getBlockStats']);
+
+// Test route
+Route::get('/admin-test', function() {
+    return 'Admin routes are working without middleware!';
 });
-
-
-

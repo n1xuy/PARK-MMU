@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Admin;
+use App\Models\SystemLog;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
@@ -47,20 +49,42 @@ class UserController extends Controller
             'password' => 'required',
         ]);
         
+        // First try regular user login
         if (Auth::attempt([
             'username' => $credentials['username'],
             'password' => $credentials['password']
         ])) {
             $request->session()->regenerate();
-            return $this->handlePostLoginRedirect(); // Modified this line
+            return $this->handlePostLoginRedirect();
         }
-
+        
+        if (Auth::guard('admin')->attempt([
+            'username' => $credentials['username'],
+            'password' => $credentials['password']
+        ])) {
+            $request->session()->regenerate();
+            
+            $admin = Auth::guard('admin')->user();
+            
+            SystemLog::create([
+                'admin_id' => $admin->id,
+                'description' => "Admin '{$admin->username}' logged in via user login",
+                'action' => 'Admin Login',
+                'model' => 'Login',
+            ]);
+            
+            return redirect()->route('admin.menu')
+                ->with('success', 'Welcome to Admin Dashboard!');
+        }
+        
         $userExists = User::where('username', $credentials['username'])->exists();
-
+        $adminExists = Admin::where('username', $credentials['username'])->exists();
+        
         return back()->withErrors([
-            $userExists ? 'password' : 'username' => $userExists 
-                ? 'The password is incorrect' 
-                : 'The username does not exist',
+            $userExists || $adminExists ? 'password' : 'username' => 
+                $userExists || $adminExists 
+                    ? 'The password is incorrect' 
+                    : 'The username does not exist',
         ])->withInput();
     }
 
