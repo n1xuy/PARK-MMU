@@ -6,9 +6,9 @@
 
 ParkMMU is a web-based parking zone status displayer with real-time data, student, visitor, staff will have reliable data and using less time to park their own vehicle in Multimedia Univeristy Cyberjaya. ParkMMU provide lots of features for user to just only one finger to control, such as:
 
-- Float bar for return and navigate
 - UI friendly and simple
 - Easy understand data display
+- Reliable Status for user
 
 ParkMMU offers easy and powerful web-based parking zone status displayer and parking finder.
 
