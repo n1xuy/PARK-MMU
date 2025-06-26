@@ -16,9 +16,4 @@ ParkMMU offers easy and powerful web-based parking zone status displayer and par
 
 Thank you for choosing ParkMMU as an assistant for parking finder and with more user data the more reliable for the data.
 
-## Code of Conduct
-
-
-## Security Vulnerabilities
-
 
