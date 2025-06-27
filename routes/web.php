@@ -124,3 +124,4 @@ Route::get('/admin-test', function() {
     return 'Admin routes are working without middleware!';
 });
 });
+
