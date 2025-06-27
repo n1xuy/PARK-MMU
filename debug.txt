@@ -11,7 +11,6 @@ use App\Http\Controllers\ReportDataController;
 use App\Http\Controllers\ParkingZoneController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ParkManageController;
-use \App\Http\Middleware\AdminAuthenticate;
 
 // ============================================
 // PUBLIC ROUTES
@@ -83,7 +82,7 @@ Route::middleware(['auth'])->group(function () {
 // ============================================
 // ADMIN ROUTES (NO MIDDLEWARE PROTECTION)
 // ============================================
-Route::middleware(['auth.admin'])->group(function () {
+
 // Admin Dashboard
 Route::get('/admin', function(){
     $announcement = Announcement::latest()->first(); 
@@ -122,5 +121,4 @@ Route::get('/admin/block-stats', [ParkManageController::class, 'getBlockStats'])
 // Test route
 Route::get('/admin-test', function() {
     return 'Admin routes are working without middleware!';
-});
 });
