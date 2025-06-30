@@ -1,0 +1,67 @@
+/* Parking Management Styles */
+.parking-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative; 
+}
+
+.background-image {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+}
+
+.button-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    z-index: 1; 
+    overflow: auto; 
+}
+
+.parking-button {
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    padding: 15px 30px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 200px;
+    text-transform: uppercase;
+}
+
+.parking-button:hover {
+    background: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 480px) {
+    .parking-button {
+        width: 160px;
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+    
+    .button-overlay {
+        gap: 15px;
+        padding: 15px;
+    }
+}
